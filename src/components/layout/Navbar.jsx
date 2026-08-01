@@ -12,6 +12,70 @@ import MobileNav from './MobileNav'
 const sectionIds = navLinks.map((link) => link.href.slice(1))
 const MOBILE_MENU_ID = 'mobile-nav-menu'
 
+function ThemeToggleButton({ theme, toggleTheme }) {
+  const isLight = theme === 'light'
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
+      data-cursor="click"
+      className="w-11 h-11 shrink-0 rounded-full glass grid place-items-center text-content/75 hover:text-primary hover:bg-surface-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={isLight ? 'sun' : 'moon'}
+          initial={{ rotate: -90, opacity: 0, scale: 0.6 }}
+          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+          exit={{ rotate: 90, opacity: 0, scale: 0.6 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="grid place-items-center"
+        >
+          {isLight ? (
+            <BsMoon className="w-[18px] h-[18px]" aria-hidden="true" />
+          ) : (
+            <BsSun className="w-[18px] h-[18px]" aria-hidden="true" />
+          )}
+        </motion.span>
+      </AnimatePresence>
+    </button>
+  )
+}
+
+function MenuButton({ open, onClick, triggerRef, menuId }) {
+  return (
+    <button
+      ref={triggerRef}
+      type="button"
+      onClick={onClick}
+      aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
+      aria-expanded={open}
+      aria-controls={menuId}
+      data-cursor="click"
+      className="w-11 h-11 shrink-0 rounded-full glass grid place-items-center text-content/75 hover:text-primary hover:bg-surface-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >
+      <span className="relative w-5 h-5" aria-hidden="true">
+        <motion.span
+          animate={{ y: open ? 6 : 0, rotate: open ? 45 : 0 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-x-0 top-1 h-0.5 bg-current rounded-full"
+        />
+        <motion.span
+          animate={{ opacity: open ? 0 : 1, x: open ? 10 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="absolute inset-x-0 top-2.5 h-0.5 bg-current rounded-full"
+        />
+        <motion.span
+          animate={{ y: open ? -6 : 0, rotate: open ? -45 : 0 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-x-0 top-4 h-0.5 bg-current rounded-full"
+        />
+      </span>
+    </button>
+  )
+}
+
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme()
   const active = useActiveSection(sectionIds)
@@ -106,8 +170,74 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-[9999] w-full">
+      {/* ═══════ MOBILE FLOATING HEADER (< lg) ═══════ */}
+      <motion.div
+        initial={false}
+        animate={{ height: scrolled ? 60 : 72 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        className={`mobile-header-bar ${
+          scrolled ? 'scrolled' : ''
+        } relative lg:hidden mx-2 mt-2 rounded-2xl border transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300 ${
+          scrolled ? 'border-border-strong' : 'border-border/70'
+        }`}
+        style={{
+          backgroundColor: scrolled ? 'var(--nav-bg)' : 'var(--nav-bg-top)',
+          backdropFilter: `blur(${scrolled ? 28 : 20}px) saturate(180%)`,
+          WebkitBackdropFilter: `blur(${scrolled ? 28 : 20}px) saturate(180%)`,
+        }}
+      >
+        <div className="flex h-full items-center justify-between gap-2 px-3">
+          {/* Profile avatar */}
+          <a
+            href="#home"
+            onClick={(e) => open && handleNavClick(e, '#home')}
+            aria-label={`${site.name} home`}
+            className="group relative shrink-0"
+          >
+            <span className="relative block h-11 w-11 rounded-full bg-gradient-accent p-[2px] shadow-[0_0_22px_-6px_var(--c-primary)] transition-transform duration-300 group-hover:scale-105 active:scale-95">
+              <span
+                className="absolute -inset-1 rounded-full bg-primary/30 blur-lg"
+                aria-hidden="true"
+              />
+              <img
+                src={site.logo}
+                alt={`${site.name} profile`}
+                width={44}
+                height={44}
+                decoding="async"
+                className="relative h-full w-full rounded-full object-cover bg-surface-2"
+              />
+            </span>
+          </a>
+
+          <div className="flex items-center gap-2">
+            {/* Resume CTA */}
+            <Button
+              href={site.resume}
+              external
+              size="sm"
+              data-cursor="click"
+              className="h-11 !rounded-full !px-4 !text-[13px]"
+            >
+              <FiDownload className="w-4 h-4" aria-hidden="true" />
+              Resume
+            </Button>
+
+            <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} />
+
+            <MenuButton
+              open={open}
+              onClick={() => setOpen((v) => !v)}
+              triggerRef={triggerRef}
+              menuId={MOBILE_MENU_ID}
+            />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ═══════ DESKTOP HEADER (lg+) ═══════ */}
       <div
-        className={`relative border-b transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300 ${headerBarClass}`}
+        className={`hidden lg:block relative border-b transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300 ${headerBarClass}`}
         style={{
           backgroundColor: scrolled ? 'var(--nav-bg)' : 'var(--nav-bg-top)',
           backdropFilter: 'blur(20px) saturate(160%)',
@@ -210,35 +340,6 @@ export default function Navbar() {
               <FiDownload className="w-4 h-4" aria-hidden="true" />
               Resume
             </Button>
-
-            {/* Hamburger */}
-            <button
-              ref={triggerRef}
-              type="button"
-              onClick={() => setOpen((v) => !v)}
-              aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
-              aria-expanded={open}
-              aria-controls={MOBILE_MENU_ID}
-              className="lg:hidden w-11 h-11 shrink-0 rounded-full glass grid place-items-center text-content hover:text-primary hover:bg-surface-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
-              <span className="relative w-5 h-5" aria-hidden="true">
-                <motion.span
-                  animate={{ y: open ? 6 : 0, rotate: open ? 45 : 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="absolute inset-x-0 top-1 h-0.5 bg-current rounded-full"
-                />
-                <motion.span
-                  animate={{ opacity: open ? 0 : 1 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute inset-x-0 top-2.5 h-0.5 bg-current rounded-full"
-                />
-                <motion.span
-                  animate={{ y: open ? -6 : 0, rotate: open ? -45 : 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="absolute inset-x-0 top-4 h-0.5 bg-current rounded-full"
-                />
-              </span>
-            </button>
           </div>
         </div>
       </div>
