@@ -5,6 +5,75 @@ import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
 import Badge from '../ui/Badge'
 
+function MobileExperienceCard({ experience }) {
+  return (
+    <article className="mobile-exp-card rounded-[22px] glass-strong p-5 sm:p-6 shadow-soft">
+      <header>
+        <div className="flex items-center justify-between gap-3">
+          <span className="flex w-11 h-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-accent text-white ring-1 ring-inset ring-white/25 shadow-[0_2px_14px_-4px_color-mix(in_srgb,var(--c-primary)_60%,transparent)]">
+            <experience.icon className="w-5 h-5" aria-hidden="true" />
+          </span>
+          <Badge tone="accent">{experience.type}</Badge>
+        </div>
+
+        <div className="mt-4">
+          <h3 className="text-[22px] font-semibold leading-[1.3] tracking-tight text-content text-balance">
+            {experience.role}
+          </h3>
+          <div className="mt-2 flex items-center gap-2">
+            <FaUniversity className="w-4 h-4 shrink-0 text-primary" aria-hidden="true" />
+            <span className="text-[16px] font-semibold text-primary">{experience.place}</span>
+          </div>
+          <div className="mt-1.5 flex items-center gap-2 text-[13px] font-medium text-muted">
+            <FiCalendar className="w-4 h-4 shrink-0 text-primary" aria-hidden="true" />
+            {experience.period}
+          </div>
+        </div>
+      </header>
+
+      <p className="mt-5 pt-5 border-t border-border text-[14px] leading-[1.7] text-muted text-pretty">
+        {experience.description}
+      </p>
+
+      <div className="mt-5 pt-5 border-t border-border">
+        <h4 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted">
+          Key Technologies
+        </h4>
+        <div className="flex flex-wrap gap-2">
+          {experience.tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-accent/10 text-accent border border-accent/25"
+            >
+              <FiCheckCircle className="w-3.5 h-3.5" aria-hidden="true" />
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-5 pt-5 border-t border-border">
+        <h4 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted">
+          Highlights
+        </h4>
+        <ul className="space-y-3">
+          {experience.highlights.map((h) => (
+            <li key={h.title} className="rounded-2xl glass p-4">
+              <div className="flex items-center gap-3">
+                <span className="flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-secondary/15 text-primary">
+                  <h.icon className="w-5 h-5" aria-hidden="true" />
+                </span>
+                <h5 className="text-[16px] font-semibold leading-snug text-content">{h.title}</h5>
+              </div>
+              <p className="mt-3 text-[14px] leading-[1.65] text-muted text-pretty">{h.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </article>
+  )
+}
+
 export default function Experience() {
   return (
     <section id="experience" className="relative py-20 md:py-28">
@@ -15,7 +84,15 @@ export default function Experience() {
           description="Hands-on industry exposure building production-grade, AI-powered systems with the MERN stack."
         />
 
-        <div className="max-w-4xl mx-auto">
+        {/* ═══════ MOBILE EXPERIENCE (< md) ═══════ */}
+        <div className="md:hidden max-w-lg mx-auto">
+          <Reveal>
+            <MobileExperienceCard experience={experience} />
+          </Reveal>
+        </div>
+
+        {/* ═══════ DESKTOP EXPERIENCE (md+) ═══════ */}
+        <div className="hidden md:block max-w-4xl mx-auto">
           <Reveal>
             <div className="gradient-border-card rounded-3xl glass-strong p-6 md:p-10">
               {/* Header */}

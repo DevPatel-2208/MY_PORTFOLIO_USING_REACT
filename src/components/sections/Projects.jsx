@@ -1,4 +1,4 @@
-import { memo, useState, useMemo, useRef } from 'react'
+import { memo, useCallback, useState, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiGithub, FiExternalLink, FiSearch, FiChevronDown, FiFolder } from 'react-icons/fi'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -78,7 +78,7 @@ const ProjectCard = memo(function ProjectCard({ project, index, onOpenCase }) {
             </div>
 
             {project.tags.length > 0 && (
-              <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+              <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5 sm:gap-2">
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
@@ -101,7 +101,7 @@ const ProjectCard = memo(function ProjectCard({ project, index, onOpenCase }) {
             <p className="mt-2.5 text-sm text-muted leading-relaxed line-clamp-3">{project.summary}</p>
 
             {/* Tech */}
-            <div className="flex flex-wrap gap-1.5 mt-4">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-4">
               {project.tech.slice(0, 5).map((t) => (
                 <span
                   key={t}
@@ -174,20 +174,20 @@ const ProjectCard = memo(function ProjectCard({ project, index, onOpenCase }) {
 
 function CaseStudySection({ title, items, icon: Icon, tone }) {
   return (
-    <div>
-      <h4 className={`flex items-center gap-2 text-sm font-bold uppercase tracking-wider ${tone}`}>
-        <Icon className="w-4 h-4" aria-hidden="true" />
+    <section className="rounded-2xl border border-modal-border bg-modal-card p-4 sm:p-5">
+      <h4 className="flex items-center gap-2 text-lg font-bold text-modal-content">
+        <Icon className={`h-4 w-4 ${tone}`} aria-hidden="true" />
         {title}
       </h4>
       <ul className="mt-3 space-y-2">
         {items.map((item) => (
-          <li key={item} className="flex items-start gap-2.5 text-sm text-muted leading-relaxed">
+          <li key={item} className="flex items-start gap-2.5 case-study-copy text-[15px] leading-7 text-modal-muted sm:text-base">
             <span className={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 ${tone}`} aria-hidden="true" />
             {item}
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   )
 }
 
@@ -195,57 +195,72 @@ function CaseStudyModal({ project, onClose }) {
   if (!project) return null
 
   return (
-    <Modal open={!!project} onClose={onClose} title={project.title} maxWidth="max-w-3xl">
-      <div className="p-5 sm:p-8">
-        <div className="flex flex-wrap gap-2 mb-5">
-          {project.tags.map((tag) => (
-            <Badge key={tag} tone="primary">{tag}</Badge>
-          ))}
-        </div>
-
-        <p className="text-muted leading-relaxed mb-6">{project.description}</p>
-
-        <div className="grid sm:grid-cols-2 gap-6 mb-6">
-          <CaseStudySection title="Key Features" items={project.features} icon={FiChevronDown} tone="text-accent" />
-          <CaseStudySection title="Challenges" items={project.challenges} icon={FiExternalLink} tone="text-warning" />
-        </div>
-
-        <div className="mb-6">
-          <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-primary">
-            <FiExternalLink className="w-4 h-4" aria-hidden="true" />
-            Solutions
-          </h4>
-          <ul className="mt-3 space-y-2">
-            {project.solutions.map((item) => (
-              <li key={item} className="flex items-start gap-2.5 text-sm text-muted leading-relaxed">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" aria-hidden="true" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          <h4 className="w-full text-sm font-bold uppercase tracking-wider text-muted mb-1">Tech Stack</h4>
-          {project.tech.map((t) => (
-            <span key={t} className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-2 text-muted border border-border">
-              {t}
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-6 border-t border-border">
+    <Modal
+      open={!!project}
+      onClose={onClose}
+      title={project.title}
+      maxWidth="max-w-[1000px]"
+      className="case-study-dialog"
+      footer={
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Button href={project.github} external className="w-full">
-            <FiGithub className="w-4 h-4 shrink-0" aria-hidden="true" />
+            <FiGithub className="h-4 w-4 shrink-0" aria-hidden="true" />
             View Source Code
           </Button>
           {project.live && (
             <Button href={project.live} external variant="outlinePrimary" className="w-full">
-              <FiExternalLink className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <FiExternalLink className="h-4 w-4 shrink-0" aria-hidden="true" />
               Live Demo
             </Button>
           )}
         </div>
+      }
+      headerContent={
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+          {project.tags.map((tag) => (
+            <Badge key={tag} tone="primary" className="!border-modal-border !bg-modal-card !text-primary">{tag}</Badge>
+          ))}
+        </div>
+      }
+    >
+      <div className="min-h-full bg-modal-bg p-4 pb-6 text-modal-content sm:p-8 sm:pb-12">
+        <section className="mb-5 rounded-2xl border border-modal-border bg-modal-card p-4 sm:p-5">
+          <h4 className="mb-2 text-lg font-bold text-modal-content sm:text-xl">Overview</h4>
+          <p className="case-study-copy text-[15px] leading-7 text-modal-muted sm:text-base">{project.description}</p>
+        </section>
+
+        <div className="mb-5 grid gap-4 sm:grid-cols-2 sm:gap-6">
+          <CaseStudySection title="Key Features" items={project.features} icon={FiChevronDown} tone="text-accent" />
+          <CaseStudySection title="Challenges" items={project.challenges} icon={FiExternalLink} tone="text-warning" />
+        </div>
+
+        <section className="mb-5 rounded-2xl border border-modal-border bg-modal-card p-4 sm:p-5">
+          <h4 className="flex items-center gap-2 text-base font-bold text-modal-content sm:text-lg">
+            <FiExternalLink className="h-4 w-4 text-primary" aria-hidden="true" />
+            Solutions
+          </h4>
+          <ul className="mt-3 space-y-2">
+            {project.solutions.map((item) => (
+              <li key={item} className="flex items-start gap-2.5 case-study-copy text-[15px] leading-7 text-modal-muted sm:text-base">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="rounded-2xl border border-modal-border bg-modal-card p-4 sm:p-5">
+          <div className="flex flex-wrap gap-2">
+          <h4 className="mb-1 w-full case-study-copy text-sm font-bold uppercase tracking-wider text-modal-muted">Tech Stack</h4>
+          {project.tech.map((t) => (
+            <span key={t} className="rounded-lg border border-modal-border bg-modal-bg px-3 py-1.5 case-study-copy text-xs font-semibold text-modal-muted">
+              {t}
+            </span>
+          ))}
+          </div>
+        </section>
+
+
       </div>
     </Modal>
   )
@@ -256,6 +271,7 @@ export default function Projects() {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(null)
   const gridRef = useRef(null)
+  const closeCaseStudy = useCallback(() => setSelected(null), [])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -366,7 +382,7 @@ export default function Projects() {
         )}
       </div>
 
-      <CaseStudyModal project={selected} onClose={() => setSelected(null)} />
+      <CaseStudyModal project={selected} onClose={closeCaseStudy} />
     </section>
   )
 }

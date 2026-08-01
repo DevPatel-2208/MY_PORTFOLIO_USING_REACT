@@ -12,6 +12,8 @@ export const experience = {
   role: 'Research & Development Internship',
   place: 'Sardar Patel University',
   period: 'May 2025 – July 2026',
+  description:
+    'Built and shipped production-grade features for a university-wide MCA Admission Assistant — conversational AI, secure REST APIs, and real-time analytics — within an R&D environment.',
   type: 'Internship',
   icon: FaFlask,
   highlights: [

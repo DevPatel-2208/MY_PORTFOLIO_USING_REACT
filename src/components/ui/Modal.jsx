@@ -1,87 +1,119 @@
-import { useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useCallback, useEffect, useId, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { FiX } from 'react-icons/fi'
-import useScrollLock from '../../hooks/useScrollLock'
-import { useEscapeKey } from '../../hooks/useScrollLock'
+import useScrollLock, { useEscapeKey } from '../../hooks/useScrollLock'
 
-export default function Modal({ open, onClose, title, children, maxWidth = 'max-w-2xl' }) {
+const panelTransition = { duration: 0.22, ease: [0.22, 1, 0.36, 1] }
+
+export default function Modal({
+  open,
+  onClose,
+  title,
+  headerContent,
+  footer,
+  children,
+  maxWidth = 'max-w-2xl',
+  className = '',
+}) {
   const panelRef = useRef(null)
+  const titleId = useId()
 
   useScrollLock(open)
   useEscapeKey(onClose, open)
 
   useEffect(() => {
     if (!open) return undefined
-    const prevActive = document.activeElement
-    const timer = window.setTimeout(() => panelRef.current?.focus(), 50)
+
+    const previousActiveElement = document.activeElement
+    const focusTimer = window.setTimeout(() => {
+      panelRef.current?.querySelector('[data-modal-close]')?.focus()
+    }, 0)
+
     return () => {
-      window.clearTimeout(timer)
-      prevActive?.focus?.()
+      window.clearTimeout(focusTimer)
+      previousActiveElement?.focus?.()
     }
   }, [open])
 
-  const trapFocus = (e) => {
-    if (e.key !== 'Tab' || !panelRef.current) return
-    const focusables = panelRef.current.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+  const trapFocus = useCallback((event) => {
+    if (event.key !== 'Tab' || !panelRef.current) return
+
+    const focusableElements = panelRef.current.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
     )
-    if (focusables.length === 0) return
-    const first = focusables[0]
-    const last = focusables[focusables.length - 1]
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault()
+    if (!focusableElements.length) return
+
+    const first = focusableElements[0]
+    const last = focusableElements[focusableElements.length - 1]
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault()
       last.focus()
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault()
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault()
       first.focus()
     }
-  }
+  }, [])
 
-  return (
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <AnimatePresence>
       {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-6"
-          style={{ background: 'rgba(2, 6, 23, 0.72)', backdropFilter: 'blur(6px)' }}
-          onClick={onClose}
-          role="dialog"
-          aria-modal="true"
-          aria-label={title || 'Dialog'}
+        <div
+          className="fixed inset-0 z-[10000] grid place-items-center p-2 sm:p-6"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) onClose()
+          }}
+          role="presentation"
         >
-          <motion.div
+          <div className="absolute inset-0 bg-modal-overlay" onMouseDown={onClose} aria-hidden="true" />
+          <motion.section
             ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={title ? titleId : undefined}
+            aria-label={title ? undefined : 'Dialog'}
             tabIndex={-1}
             onKeyDown={trapFocus}
-            initial={{ opacity: 0, y: 40, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-            onClick={(e) => e.stopPropagation()}
-            className={`relative w-full ${maxWidth} max-h-[88vh] sm:max-h-[85vh] rounded-t-3xl sm:rounded-3xl overflow-hidden outline-none glass-strong shadow-2xl`}
+            initial={{ scale: 0.98, y: 8 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.98, y: 8 }}
+            transition={panelTransition}
+            className={`relative flex h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] sm:h-[90vh] sm:max-h-[calc(100dvh-2rem)] sm:w-[90vw] ${maxWidth} min-h-0 flex-col overflow-hidden rounded-2xl border border-modal-border bg-modal-bg text-modal-content shadow-2xl outline-none sm:rounded-3xl ${className}`}
           >
-            {title && (
-              <div className="flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-border bg-surface/50">
-                <h3 className="text-base sm:text-lg font-bold text-content">{title}</h3>
+            {(title || headerContent) && (
+              <header className="z-10 flex shrink-0 items-start justify-between gap-3 border-b border-modal-border bg-modal-bg px-4 py-3 sm:gap-4 sm:px-7 sm:py-5">
+                <div className="min-w-0">
+                  {title && <h3 id={titleId} className="text-xl font-bold leading-tight text-modal-content sm:text-2xl lg:text-3xl">{title}</h3>}
+                  {headerContent && <div className="mt-3">{headerContent}</div>}
+                </div>
                 <button
+                  data-modal-close
                   type="button"
                   onClick={onClose}
                   aria-label="Close dialog"
-                  className="p-2 rounded-full text-muted hover:text-content hover:bg-surface-2 transition-colors cursor-pointer"
+                  className="grid h-10 w-10 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-full border border-modal-border bg-modal-control text-modal-muted transition-all duration-200 hover:scale-105 hover:border-primary/50 hover:bg-modal-card hover:text-modal-content active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
-                  <FiX className="w-5 h-5" />
+                  <FiX className="h-5 w-5" aria-hidden="true" />
                 </button>
-              </div>
+              </header>
             )}
-            <div className="overflow-y-auto max-h-[calc(88vh-4.5rem)] sm:max-h-[calc(85vh-4.5rem)]">
+
+            <div className="modal-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]" tabIndex={0} aria-label="Dialog content">
               {children}
             </div>
-          </motion.div>
-        </motion.div>
+
+            {footer && (
+              <footer className="z-10 shrink-0 border-t border-modal-border bg-modal-bg px-4 py-3 sm:px-8 sm:py-5">
+                {footer}
+              </footer>
+            )}
+          </motion.section>
+        </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }

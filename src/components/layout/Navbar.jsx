@@ -7,6 +7,7 @@ import useActiveSection from '../../hooks/useActiveSection'
 import useScrollLock, { useEscapeKey } from '../../hooks/useScrollLock'
 import { navLinks, site } from '../../data/site'
 import Button from '../ui/Button'
+import MobileNav from './MobileNav'
 
 const sectionIds = navLinks.map((link) => link.href.slice(1))
 const MOBILE_MENU_ID = 'mobile-nav-menu'
@@ -21,6 +22,7 @@ export default function Navbar() {
   const panelRef = useRef(null)
 
   const isLight = theme === 'light'
+  const closeMenu = useCallback(() => setOpen(false), [])
 
   /* ---- Scroll state (rAF-throttled) ---- */
   useEffect(() => {
@@ -39,14 +41,17 @@ export default function Navbar() {
 
   /* ---- Lock body scroll + close on Escape ---- */
   useScrollLock(open)
-  useEscapeKey(() => setOpen(false), open)
+  useEscapeKey(closeMenu, open)
 
   /* ---- Focus management: move focus into menu, restore on close ---- */
   useEffect(() => {
     if (!open) return undefined
     const previous = document.activeElement
     const timer = window.setTimeout(() => {
-      panelRef.current?.querySelector('a, button, [href]')?.focus()
+      const focusTarget =
+        panelRef.current?.querySelector('[data-mobile-close]') ??
+        panelRef.current?.querySelector('a, button, [href]')
+      focusTarget?.focus()
     }, 80)
     return () => {
       window.clearTimeout(timer)
@@ -83,7 +88,6 @@ export default function Navbar() {
       if (!el) return
       e.preventDefault()
       setOpen(false)
-      document.body.style.overflow = ''
       window.requestAnimationFrame(() => {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' })
       })
@@ -101,16 +105,16 @@ export default function Navbar() {
     }`
 
   return (
-    <header className="sticky top-0 z-50 w-full">
+    <header className="fixed inset-x-0 top-0 z-[9999] w-full">
       <div
-        className={`relative border-b transition-all duration-300 ${headerBarClass}`}
+        className={`relative border-b transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300 ${headerBarClass}`}
         style={{
-          backgroundColor: scrolled ? 'var(--nav-bg)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(20px) saturate(160%)' : 'blur(6px)',
-          WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(160%)' : 'blur(6px)',
+          backgroundColor: scrolled ? 'var(--nav-bg)' : 'var(--nav-bg-top)',
+          backdropFilter: 'blur(20px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[1fr_auto_1fr] items-center gap-3 h-16 lg:h-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[1fr_auto_1fr] items-center gap-3 h-[70px] lg:h-20">
           {/* Logo */}
           <a
             href="#home"
@@ -215,7 +219,7 @@ export default function Navbar() {
               aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={open}
               aria-controls={MOBILE_MENU_ID}
-              className="lg:hidden w-11 h-11 rounded-full glass grid place-items-center text-content hover:text-primary hover:bg-surface-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="lg:hidden w-11 h-11 shrink-0 rounded-full glass grid place-items-center text-content hover:text-primary hover:bg-surface-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               <span className="relative w-5 h-5" aria-hidden="true">
                 <motion.span
@@ -239,77 +243,16 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              key="mobile-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm lg:hidden"
-              onClick={() => setOpen(false)}
-              aria-hidden="true"
-            />
-            <motion.div
-              key="mobile-panel"
-              ref={panelRef}
-              id={MOBILE_MENU_ID}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Navigation menu"
-              onKeyDown={handleMenuKeyDown}
-              initial={{ opacity: 0, y: -24, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -24, scale: 0.97 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-x-3 top-[4.5rem] bottom-3 z-[45] origin-top rounded-2xl glass-strong border border-border-strong shadow-2xl overflow-hidden flex flex-col lg:hidden"
-            >
-              <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Mobile navigation">
-                <ul className="space-y-1">
-                  {navLinks.map((link, i) => {
-                    const id = link.href.slice(1)
-                    const isActive = active === id
-                    return (
-                      <motion.li
-                        key={link.href}
-                        initial={{ opacity: 0, x: -16 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.04 + i * 0.035 }}
-                      >
-                        <a
-                          href={link.href}
-                          onClick={(e) => handleNavClick(e, link.href)}
-                          aria-current={isActive ? 'page' : undefined}
-                          className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-                            isActive
-                              ? 'text-white bg-gradient-accent shadow-glow'
-                              : 'text-muted hover:text-content hover:bg-surface-2'
-                          }`}
-                        >
-                          {link.label}
-                          {isActive && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-white" aria-hidden="true" />
-                          )}
-                        </a>
-                      </motion.li>
-                    )
-                  })}
-                </ul>
-              </nav>
-
-              <div className="px-3 pt-3 pb-4 border-t border-border shrink-0">
-                <Button href={site.resume} external data-cursor="click" className="w-full" size="lg">
-                  <FiDownload className="w-4 h-4" aria-hidden="true" />
-                  Download Resume
-                </Button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <MobileNav
+        active={active}
+        open={open}
+        panelRef={panelRef}
+        onClose={closeMenu}
+        onNavigate={handleNavClick}
+        onKeyDown={handleMenuKeyDown}
+        theme={theme}
+        toggleTheme={toggleTheme}
+      />
     </header>
   )
 }

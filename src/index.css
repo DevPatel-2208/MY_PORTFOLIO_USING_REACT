@@ -19,6 +19,20 @@
   --color-secondary: var(--c-secondary);
   --color-accent: var(--c-accent);
   --color-warning: var(--c-warning);
+  --color-modal-bg: var(--c-modal-bg);
+  --color-modal-card: var(--c-modal-card);
+  --color-modal-border: var(--c-modal-border);
+  --color-modal-content: var(--c-modal-content);
+  --color-modal-muted: var(--c-modal-muted);
+  --color-modal-control: var(--c-modal-control);
+  --color-modal-overlay: var(--c-modal-overlay);
+
+  --color-drawer-bg: var(--c-drawer-bg);
+  --color-drawer-header: var(--c-drawer-header);
+  --color-drawer-panel: var(--c-drawer-panel);
+  --color-drawer-card: var(--c-drawer-card);
+  --color-drawer-card-hover: var(--c-drawer-card-hover);
+
 
   --shadow-soft: 0 10px 40px -12px rgba(2, 6, 23, 0.18);
   --shadow-glow: 0 0 24px -6px rgba(99, 102, 241, 0.5);
@@ -46,14 +60,27 @@
   --c-secondary: #9333ea;
   --c-accent: #059669;
   --c-warning: #d97706;
+  --c-modal-bg: #ffffff;
+  --c-modal-card: #f8fafc;
+  --c-modal-border: #e2e8f0;
+  --c-modal-content: #0f172a;
+  --c-modal-muted: #475569;
+  --c-modal-control: #f8fafc;
+  --c-modal-overlay: rgb(15 23 42 / 0.74);
 
   --heading-start: #0f172a;
   --heading-end: #4f46e5;
-  --nav-bg: rgba(255, 255, 255, 0.72);
+  --nav-bg: rgba(255, 255, 255, 0.94);
+  --nav-bg-top: rgba(255, 255, 255, 0.88);
   --overlay: rgba(255, 255, 255, 0.86);
   --glow-a: rgba(79, 70, 229, 0.14);
   --glow-b: rgba(168, 85, 247, 0.12);
   --glow-c: rgba(16, 185, 129, 0.1);
+  --c-drawer-bg: #f7f9fd;
+  --c-drawer-header: rgba(255, 255, 255, 0.74);
+  --c-drawer-panel: #ffffff;
+  --c-drawer-card: #edf0f7;
+  --c-drawer-card-hover: #f2f4fb;
   color-scheme: light;
 }
 
@@ -71,14 +98,27 @@
   --c-secondary: #c084fc;
   --c-accent: #34d399;
   --c-warning: #f59e0b;
+  --c-modal-bg: #0f172a;
+  --c-modal-card: #1e293b;
+  --c-modal-border: #334155;
+  --c-modal-content: #f1f5f9;
+  --c-modal-muted: #cbd5e1;
+  --c-modal-control: #1e293b;
+  --c-modal-overlay: rgb(2 6 23 / 0.8);
 
   --heading-start: #ffffff;
   --heading-end: #94a3b8;
-  --nav-bg: rgba(7, 12, 24, 0.72);
+  --nav-bg: rgba(7, 12, 24, 0.94);
+  --nav-bg-top: rgba(7, 12, 24, 0.88);
   --overlay: rgba(7, 12, 24, 0.9);
   --glow-a: rgba(99, 102, 241, 0.16);
   --glow-b: rgba(168, 85, 247, 0.14);
   --glow-c: rgba(16, 185, 129, 0.12);
+  --c-drawer-bg: #0b1120;
+  --c-drawer-header: rgba(255, 255, 255, 0.045);
+  --c-drawer-panel: #121b30;
+  --c-drawer-card: #16233c;
+  --c-drawer-card-hover: #1c2b48;
   color-scheme: dark;
 }
 
@@ -101,6 +141,21 @@
     overflow-x: hidden;
     overflow-x: clip;
     -webkit-font-smoothing: antialiased;
+  }
+
+  #root {
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  main {
+    padding-top: 70px;
+  }
+
+  @media (min-width: 1024px) {
+    main {
+      padding-top: 5rem;
+    }
   }
 
   body::before {
@@ -180,6 +235,169 @@
     color-mix(in srgb, var(--c-primary) 42%, #1e1b4b),
     color-mix(in srgb, var(--c-secondary) 42%, #3b0764)
   );
+}
+
+@utility timeline-line-grad {
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--c-primary) 40%, transparent) 22%,
+    color-mix(in srgb, var(--c-primary) 65%, transparent) 50%,
+    color-mix(in srgb, var(--c-primary) 40%, transparent) 78%,
+    transparent
+  );
+}
+
+@utility timeline-line-grad-desktop {
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(147, 51, 234, 0.75),
+    rgba(147, 51, 234, 1),
+    rgba(147, 51, 234, 0.75),
+    transparent
+  );
+}
+
+/* ─── Mobile Education Timeline ─── */
+
+.mobile-timeline-line {
+  position: absolute;
+  left: 24px;
+  top: 0;
+  bottom: 21px;
+  width: 2px;
+  border-radius: 9999px;
+  opacity: 0.4;
+  transform-origin: top;
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--c-primary) 50%, transparent) 16%,
+    color-mix(in srgb, var(--c-primary) 80%, transparent) 50%,
+    color-mix(in srgb, var(--c-primary) 50%, transparent) 84%,
+    transparent
+  );
+}
+
+.mobile-timeline-row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-left: 4px;
+}
+
+.mobile-timeline-node {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+}
+
+.mobile-timeline-node-glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  background: var(--c-primary);
+  opacity: 0.16;
+  filter: blur(10px);
+  animation: mobile-pulse 3.5s ease-in-out infinite;
+}
+
+.mobile-timeline-node-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background-image: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  color: #ffffff;
+  box-shadow:
+    0 6px 20px -6px color-mix(in srgb, var(--c-primary) 55%, transparent),
+    0 0 0 3px var(--c-base),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+.dark .mobile-timeline-node-ring {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-primary) 42%, #1e1b4b),
+    color-mix(in srgb, var(--c-secondary) 42%, #3b0764)
+  );
+}
+
+.mobile-timeline-endpoint {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+}
+
+.mobile-edu-card {
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .mobile-edu-card {
+  box-shadow: 0 14px 40px -18px rgba(0, 0, 0, 0.55);
+}
+
+.mobile-edu-card:active {
+  transform: scale(0.985);
+}
+
+.mobile-edu-bar-track {
+  background: color-mix(in srgb, var(--c-muted) 14%, transparent);
+}
+
+@keyframes mobile-pulse {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.26;
+    transform: scale(1.05);
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-timeline-line,
+  .mobile-timeline-row,
+  .mobile-timeline-node,
+  .mobile-timeline-node-glow,
+  .mobile-timeline-node-ring,
+  .mobile-timeline-endpoint,
+  .mobile-edu-card {
+    display: none;
+  }
+}
+
+/* ─── Mobile Experience Card ─── */
+
+.mobile-exp-card {
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .mobile-exp-card {
+  box-shadow: 0 14px 40px -18px rgba(0, 0, 0, 0.55);
+}
+
+.mobile-exp-card:active {
+  transform: scale(0.985);
 }
 
 @utility ring-glow {
@@ -281,6 +499,21 @@
   border-radius: 999px;
 }
 
+/* Dedicated modal scrolling: keep long case studies discoverable in every browser. */
+.modal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-primary) transparent;
+}
+
+.modal-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--c-primary) 68%, transparent);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
 /* Hide horizontal overflow from decorative blobs */
 .decorative {
   pointer-events: none;
@@ -311,4 +544,18 @@
   width: 18px;
   background: #ffffff;
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+/* Case-study content owns its readable text colors so shared surface tokens cannot invert them. */
+.case-study-dialog {
+  --case-study-copy: #475569;
+}
+
+.dark .case-study-dialog {
+  --case-study-copy: #cbd5e1;
+}
+
+.case-study-dialog .case-study-copy {
+  color: var(--case-study-copy);
+  opacity: 1;
 }
