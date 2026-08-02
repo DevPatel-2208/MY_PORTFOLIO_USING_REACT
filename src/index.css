@@ -668,12 +668,23 @@
 /* ── Root ─────────────────────────────────────────────────────────── */
 .preloader {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 100000;
-  display: grid;
-  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 1.25rem;
+  padding-top: max(1.25rem, env(safe-area-inset-top, 0px));
+  padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+  padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+  min-height: 100vh;
+  min-height: 100dvh;
   background:
     radial-gradient(1100px 600px at 12% -6%, color-mix(in srgb, var(--c-primary) 9%, transparent), transparent 60%),
     radial-gradient(900px 560px at 105% 4%, color-mix(in srgb, var(--c-secondary) 8%, transparent), transparent 55%),
@@ -862,7 +873,8 @@
   z-index: 6;
   isolation: isolate;
   margin: auto;
-  width: min(92vw, 26rem);
+  width: min(90vw, 27rem);
+  max-width: 100%;
   padding: clamp(1.4rem, 4vw, 2.1rem);
   border-radius: clamp(1.5rem, 4vw, 2rem);
   background: color-mix(in srgb, var(--c-base-2) 62%, transparent);
@@ -1212,10 +1224,27 @@
 }
 
 /* ── Responsive ───────────────────────────────────────────────────── */
-@media (max-width: 400px) {
+/* Tablet */
+@media (max-width: 1024px) {
   .preloader-card {
-    width: 94vw;
-    padding: 1.25rem 1.1rem;
+    width: min(90vw, 25rem);
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .preloader {
+    padding: 0.9rem;
+    padding-top: max(0.9rem, env(safe-area-inset-top, 0px));
+    padding-right: max(0.9rem, env(safe-area-inset-right, 0px));
+    padding-bottom: max(0.9rem, env(safe-area-inset-bottom, 0px));
+    padding-left: max(0.9rem, env(safe-area-inset-left, 0px));
+  }
+
+  .preloader-card {
+    width: min(88vw, 21.25rem);
+    min-width: 280px;
+    padding: 1.4rem 1.15rem;
   }
 
   .preloader-message {
@@ -1223,6 +1252,14 @@
   }
 }
 
+@media (max-width: 359px) {
+  .preloader-card {
+    width: 88vw;
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* Short landscape screens */
 @media (max-height: 640px) and (orientation: landscape) {
   .preloader-card {
     display: flex;
