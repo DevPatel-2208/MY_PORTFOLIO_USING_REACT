@@ -671,9 +671,9 @@
   inset: 0;
   z-index: 100000;
   display: grid;
-  place-items: center;
   padding: 1.25rem;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   background:
     radial-gradient(1100px 600px at 12% -6%, color-mix(in srgb, var(--c-primary) 9%, transparent), transparent 60%),
     radial-gradient(900px 560px at 105% 4%, color-mix(in srgb, var(--c-secondary) 8%, transparent), transparent 55%),
@@ -861,6 +861,7 @@
   position: relative;
   z-index: 6;
   isolation: isolate;
+  margin: auto;
   width: min(92vw, 26rem);
   padding: clamp(1.4rem, 4vw, 2.1rem);
   border-radius: clamp(1.5rem, 4vw, 2rem);

@@ -472,19 +472,22 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center overflow-hidden pt-24 pb-20"
+      className="relative min-h-screen flex flex-col overflow-hidden pt-[86px] pb-20"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-        {/* ═══════ SYSTEM STATUS BAR (all breakpoints) ═══════ */}
-        <div className="mb-10 lg:mb-12">
-          <SystemStatus />
+      {/* ═══════ SYSTEM STATUS BAR (pinned below header) ═══════ */}
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 lg:mb-10">
+        <SystemStatus />
+      </div>
+
+      {/* ═══════ HERO CONTENT (centered in remaining space) ═══════ */}
+      <div className="flex-1 flex items-center">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* MOBILE HERO (< md) */}
+          <MobileHero typed={typed} />
+
+          {/* DESKTOP HERO (md+) */}
+          <DesktopHero typed={typed} />
         </div>
-
-        {/* ═══════ MOBILE HERO (< md) ═══════ */}
-        <MobileHero typed={typed} />
-
-        {/* ═══════ DESKTOP HERO (md+) ═══════ */}
-        <DesktopHero typed={typed} />
       </div>
 
       {/* Scroll indicator */}
