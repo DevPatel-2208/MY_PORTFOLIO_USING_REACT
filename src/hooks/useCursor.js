@@ -7,9 +7,9 @@ const LABELS = {
   link: '',
   badge: '',
   card: '',
-  click: 'Click',
-  view: 'View',
-  plus: '+',
+  click: '',
+  view: '',
+  plus: '',
   text: '',
 }
 

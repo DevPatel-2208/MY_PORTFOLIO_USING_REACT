@@ -386,18 +386,20 @@ export default function Achievements() {
       </div>
 
       {/* Lightbox */}
-      <Modal open={!!selected} onClose={() => setSelected(null)} maxWidth="max-w-3xl">
+      <Modal open={!!selected} onClose={() => setSelected(null)} imageViewer>
         {selected && (
-          <div className="p-4 sm:p-6">
+          <figure className="flex w-full flex-col items-center gap-4">
             <img
               src={selected.src}
               alt={`${selected.label} — ${selected.caption}`}
-              className="w-full rounded-2xl border border-border"
+              className="max-h-[70vh] max-w-full rounded-xl object-contain shadow-2xl sm:max-h-[76vh]"
+              loading="lazy"
+              decoding="async"
             />
-            <p className="mt-4 text-center text-sm font-semibold text-content">
+            <figcaption className="text-center text-sm font-semibold text-white/95">
               {selected.label} — {selected.caption}
-            </p>
-          </div>
+            </figcaption>
+          </figure>
         )}
       </Modal>
     </section>

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
 import BackgroundFX from './components/layout/BackgroundFX'
 import ScrollProgress from './components/layout/ScrollProgress'
@@ -6,6 +6,7 @@ import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import ScrollToTop from './components/layout/ScrollToTop'
 import Cursor from './components/cursor/Cursor'
+import Preloader from './components/layout/Preloader'
 import SEO from './components/seo/SEO'
 
 const Hero = lazy(() => import('./components/sections/Hero'))
@@ -36,59 +37,65 @@ function LazySection({ children }) {
 
 function App() {
   const [showResults, setShowResults] = useState(false)
+  const [loaded, setLoaded] = useState(false)
+  const finishLoad = useCallback(() => setLoaded(true), [])
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="relative min-h-screen"
-    >
-      <SEO />
-      <Cursor />
-      <BackgroundFX />
-      <ScrollProgress />
-      <Navbar />
+    <>
+      {!loaded && <Preloader onDone={finishLoad} />}
 
-      <main>
-        <LazySection>
-          <Hero />
-        </LazySection>
-        <LazySection>
-          <About />
-        </LazySection>
-        <LazySection>
-          <Experience />
-        </LazySection>
-        <LazySection>
-          <Education onShowResults={() => setShowResults(true)} />
-        </LazySection>
-        <LazySection>
-          <Skills />
-        </LazySection>
-        <LazySection>
-          <Services />
-        </LazySection>
-        <LazySection>
-          <Projects />
-        </LazySection>
-        <LazySection>
-          <Certificates />
-        </LazySection>
-        <LazySection>
-          <Achievements />
-        </LazySection>
-        <LazySection>
-          <Contact />
-        </LazySection>
-      </main>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="relative min-h-screen"
+      >
+        <SEO />
+        <Cursor />
+        <BackgroundFX />
+        <ScrollProgress />
+        <Navbar />
 
-      <Footer />
-      <ScrollToTop />
-      <Suspense fallback={null}>
-        <ResultModal show={showResults} onClose={() => setShowResults(false)} />
-      </Suspense>
-    </motion.div>
+        <main>
+          <LazySection>
+            <Hero />
+          </LazySection>
+          <LazySection>
+            <About />
+          </LazySection>
+          <LazySection>
+            <Experience />
+          </LazySection>
+          <LazySection>
+            <Education onShowResults={() => setShowResults(true)} />
+          </LazySection>
+          <LazySection>
+            <Skills />
+          </LazySection>
+          <LazySection>
+            <Services />
+          </LazySection>
+          <LazySection>
+            <Projects />
+          </LazySection>
+          <LazySection>
+            <Certificates />
+          </LazySection>
+          <LazySection>
+            <Achievements />
+          </LazySection>
+          <LazySection>
+            <Contact />
+          </LazySection>
+        </main>
+
+        <Footer />
+        <ScrollToTop />
+        <Suspense fallback={null}>
+          <ResultModal show={showResults} onClose={() => setShowResults(false)} />
+        </Suspense>
+      </motion.div>
+    </>
   )
 }
 

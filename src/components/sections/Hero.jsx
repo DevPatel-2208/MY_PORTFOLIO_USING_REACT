@@ -6,6 +6,7 @@ import { typedRoles, heroStats, site } from '../../data/site'
 import SocialLinks from '../ui/SocialLinks'
 import AnimatedNumber from '../ui/AnimatedNumber'
 import Button from '../ui/Button'
+import SystemStatus from '../ui/SystemStatus'
 
 function useTypewriter(words) {
   const [text, setText] = useState('')
@@ -54,41 +55,17 @@ function useTypewriter(words) {
 }
 
 const floatingTech = [
-  {
-    icon: SiReact,
-    label: 'React',
-    pos: 'top-1/2 -translate-y-1/2 -left-3 sm:-top-5 sm:translate-y-0 sm:-left-8',
-    delay: 0.2,
-    color: '#61dafb',
-  },
-  {
-    icon: SiNodedotjs,
-    label: 'Node.js',
-    pos: 'top-1/2 -translate-y-1/2 -right-3 sm:-right-10',
-    delay: 0.4,
-    color: '#68a063',
-  },
-  {
-    icon: SiMongodb,
-    label: 'MongoDB',
-    pos: '-bottom-3 -left-2 sm:bottom-8 sm:-left-12',
-    delay: 0.6,
-    color: '#4faa41',
-  },
-  {
-    icon: SiExpress,
-    label: 'Express',
-    pos: '-bottom-3 -right-2 sm:-bottom-5 sm:right-6',
-    delay: 0.8,
-    color: 'var(--c-content)',
-  },
+  { icon: SiReact, label: 'React', pos: '-top-4 -left-4', delay: 0.2, color: '#61dafb' },
+  { icon: SiNodedotjs, label: 'Node.js', pos: '-top-4 -right-4', delay: 0.4, color: '#68a063' },
+  { icon: SiMongodb, label: 'MongoDB', pos: '-bottom-4 -left-4', delay: 0.6, color: '#4faa41' },
+  { icon: SiExpress, label: 'Express', pos: '-bottom-4 -right-4', delay: 0.8, color: 'var(--c-content)' },
 ]
 
 const mobileTech = [
-  { icon: SiReact, label: 'React', pos: '-top-4 -left-3', delay: 0.2, color: '#61dafb' },
-  { icon: SiNodedotjs, label: 'Node.js', pos: '-top-4 -right-3', delay: 0.4, color: '#68a063' },
-  { icon: SiMongodb, label: 'MongoDB', pos: '-bottom-3 -left-3', delay: 0.6, color: '#4faa41' },
-  { icon: SiExpress, label: 'Express', pos: '-bottom-3 -right-3', delay: 0.8, color: 'var(--c-content)' },
+  { icon: SiReact, label: 'React', pos: '-top-2 -left-2', delay: 0.2, color: '#61dafb' },
+  { icon: SiNodedotjs, label: 'Node.js', pos: '-top-2 -right-2', delay: 0.4, color: '#68a063' },
+  { icon: SiMongodb, label: 'MongoDB', pos: '-bottom-2 -left-2', delay: 0.6, color: '#4faa41' },
+  { icon: SiExpress, label: 'Express', pos: '-bottom-2 -right-2', delay: 0.8, color: 'var(--c-content)' },
 ]
 
 function MobileHero({ typed }) {
@@ -130,7 +107,7 @@ function MobileHero({ typed }) {
         transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
         className="relative mt-9 mb-11 flex items-center justify-center"
       >
-        <div className="relative h-[200px] w-[200px] sm:h-[216px] sm:w-[216px]">
+        <div className="relative w-[min(90vw,320px)] h-[min(90vw,320px)] sm:h-88 sm:w-88">
           {/* Rotating dashed ring */}
           <div
             className="absolute inset-0 rounded-full"
@@ -142,13 +119,13 @@ function MobileHero({ typed }) {
           />
           {/* Glow */}
           <div
-            className="absolute inset-4 rounded-full animate-blob"
+            className="absolute inset-0.5 rounded-full animate-blob"
             style={{ background: 'var(--glow-b)', filter: 'blur(44px)' }}
             aria-hidden="true"
           />
 
           {/* Portrait with gradient ring */}
-          <div className="absolute inset-5 rounded-full bg-gradient-accent p-[3px] shadow-[0_18px_50px_-18px_var(--c-primary)]">
+          <div className="absolute inset-1 rounded-full bg-gradient-accent p-[3px] shadow-[0_18px_50px_-18px_var(--c-primary)]">
             <div className="relative h-full w-full overflow-hidden rounded-full">
               <img
                 src="/image%20dev.jpeg"
@@ -168,11 +145,11 @@ function MobileHero({ typed }) {
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.8 + i * 0.12, type: 'spring', stiffness: 260, damping: 18 }}
-              className={`absolute ${t.pos} animate-float`}
+              className={`absolute ${t.pos} animate-float-soft`}
               style={{ animationDelay: `${i * 1.2}s` }}
             >
-              <div className="flex items-center gap-1.5 rounded-full px-3 py-2 glass-strong shadow-md">
-                <t.icon className="w-4 h-4" style={{ color: t.color }} aria-hidden="true" />
+              <div className="tech-badge flex items-center gap-1.5 rounded-full px-3 py-1.5">
+                <t.icon className="w-4 h-4 shrink-0" style={{ color: t.color }} aria-hidden="true" />
                 <span className="text-[11px] font-bold text-content whitespace-nowrap">{t.label}</span>
               </div>
             </motion.div>
@@ -322,7 +299,7 @@ function DesktopHero({ typed }) {
           transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
           className="order-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:self-center relative flex items-center justify-center mt-6 lg:mt-0"
         >
-          <div className="relative w-[70vw] h-[70vw] max-w-[18rem] min-w-[15rem] sm:w-80 sm:h-80 lg:w-96 lg:h-96 lg:max-w-full">
+          <div className="relative w-[70vw] h-[70vw] sm:w-96 sm:h-96 lg:w-[28rem] lg:h-[28rem]">
             <div
               className="absolute inset-0 rounded-full"
               style={{
@@ -332,12 +309,12 @@ function DesktopHero({ typed }) {
               aria-hidden="true"
             />
             <div
-              className="absolute inset-4 rounded-full animate-blob"
+              className="absolute inset-3 rounded-full animate-blob"
               style={{ background: 'var(--glow-b)', filter: 'blur(50px)' }}
               aria-hidden="true"
             />
 
-            <div className="absolute inset-6 rounded-full overflow-hidden glass-strong p-1.5">
+            <div className="absolute inset-5 rounded-full overflow-hidden glass-strong p-1.5">
               <img
                 src="/image%20dev.jpeg"
                 alt={`${site.name} — ${site.role}`}
@@ -354,11 +331,11 @@ function DesktopHero({ typed }) {
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.9 + i * 0.15, type: 'spring', stiffness: 260, damping: 18 }}
-                className={`absolute ${t.pos} animate-float`}
+                className={`absolute ${t.pos} animate-float-soft`}
                 style={{ animationDelay: `${i * 1.2}s` }}
               >
-                <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl glass-strong shadow-md">
-                  <t.icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: t.color }} aria-hidden="true" />
+                <div className="tech-badge flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2">
+                  <t.icon className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" style={{ color: t.color }} aria-hidden="true" />
                   <span className="text-[11px] sm:text-xs font-bold text-content whitespace-nowrap">{t.label}</span>
                 </div>
               </motion.div>
@@ -498,6 +475,11 @@ export default function Hero() {
       className="relative min-h-screen flex items-center overflow-hidden pt-24 pb-20"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+        {/* ═══════ SYSTEM STATUS BAR (all breakpoints) ═══════ */}
+        <div className="mb-10 lg:mb-12">
+          <SystemStatus />
+        </div>
+
         {/* ═══════ MOBILE HERO (< md) ═══════ */}
         <MobileHero typed={typed} />
 

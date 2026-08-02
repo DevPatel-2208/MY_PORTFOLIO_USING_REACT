@@ -1,6 +1,16 @@
 import { memo, useCallback, useState, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiGithub, FiExternalLink, FiSearch, FiChevronDown, FiFolder } from 'react-icons/fi'
+import {
+  FiGithub,
+  FiExternalLink,
+  FiSearch,
+  FiChevronDown,
+  FiFolder,
+  FiCheck,
+  FiZap,
+  FiAlertTriangle,
+  FiCpu,
+} from 'react-icons/fi'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
 import 'swiper/css'
@@ -54,7 +64,7 @@ function ProjectImages({ images, title }) {
 const ProjectCard = memo(function ProjectCard({ project, index, onOpenCase }) {
   return (
     <Reveal delay={index * 0.05} amount={0.15} className="h-full">
-      <TiltCard className="h-full">
+      <TiltCard className="h-full" depth={48}>
         <article
           data-cursor="plus"
           className="group relative h-full rounded-3xl glass overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-glow hover:border-primary/40 hover:bg-surface-2/70 flex flex-col"
@@ -172,18 +182,30 @@ const ProjectCard = memo(function ProjectCard({ project, index, onOpenCase }) {
   )
 })
 
+const caseToneStyles = {
+  accent: { badge: 'bg-emerald-500/12 text-emerald-500', check: 'bg-emerald-500/12 text-emerald-500' },
+  warning: { badge: 'bg-amber-500/12 text-amber-500', check: 'bg-amber-500/12 text-amber-500' },
+  primary: { badge: 'bg-primary/12 text-primary', check: 'bg-primary/12 text-primary' },
+}
+
 function CaseStudySection({ title, items, icon: Icon, tone }) {
+  const toneStyles = caseToneStyles[tone] || caseToneStyles.primary
+
   return (
-    <section className="rounded-2xl border border-modal-border bg-modal-card p-4 sm:p-5">
-      <h4 className="flex items-center gap-2 text-lg font-bold text-modal-content">
-        <Icon className={`h-4 w-4 ${tone}`} aria-hidden="true" />
+    <section className="rounded-[20px] border border-modal-border bg-modal-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_18px_44px_-20px_rgba(2,6,23,0.32)] sm:p-7">
+      <h4 className="flex items-center gap-2.5 text-lg font-extrabold tracking-tight text-modal-content sm:text-xl">
+        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${toneStyles.badge}`}>
+          <Icon className="h-4 w-4" aria-hidden="true" />
+        </span>
         {title}
       </h4>
-      <ul className="mt-3 space-y-2">
+      <ul className="mt-4 space-y-3">
         {items.map((item) => (
-          <li key={item} className="flex items-start gap-2.5 case-study-copy text-[15px] leading-7 text-modal-muted sm:text-base">
-            <span className={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 ${tone}`} aria-hidden="true" />
-            {item}
+          <li key={item} className="flex items-start gap-3 case-study-copy text-[15px] font-medium leading-[1.8] sm:text-base">
+            <span className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full ${toneStyles.check}`}>
+              <FiCheck className="h-3 w-3" aria-hidden="true" />
+            </span>
+            <span className="min-w-0">{item}</span>
           </li>
         ))}
       </ul>
@@ -199,16 +221,16 @@ function CaseStudyModal({ project, onClose }) {
       open={!!project}
       onClose={onClose}
       title={project.title}
-      maxWidth="max-w-[1000px]"
+      maxWidth="max-w-[1100px]"
       className="case-study-dialog"
       footer={
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Button href={project.github} external className="w-full">
+        <div className={`grid gap-3 ${project.live ? 'sm:grid-cols-2' : 'grid-cols-1'}`}>
+          <Button href={project.github} external size="lg" className="w-full">
             <FiGithub className="h-4 w-4 shrink-0" aria-hidden="true" />
             View Source Code
           </Button>
           {project.live && (
-            <Button href={project.live} external variant="outlinePrimary" className="w-full">
+            <Button href={project.live} external variant="outlinePrimary" size="lg" className="w-full">
               <FiExternalLink className="h-4 w-4 shrink-0" aria-hidden="true" />
               Live Demo
             </Button>
@@ -223,44 +245,51 @@ function CaseStudyModal({ project, onClose }) {
         </div>
       }
     >
-      <div className="min-h-full bg-modal-bg p-4 pb-6 text-modal-content sm:p-8 sm:pb-12">
-        <section className="mb-5 rounded-2xl border border-modal-border bg-modal-card p-4 sm:p-5">
-          <h4 className="mb-2 text-lg font-bold text-modal-content sm:text-xl">Overview</h4>
-          <p className="case-study-copy text-[15px] leading-7 text-modal-muted sm:text-base">{project.description}</p>
-        </section>
+      <div className="min-h-full bg-modal-bg p-5 pb-8 sm:p-8 sm:pb-12">
+        <div className="space-y-6">
+          <section className="rounded-[20px] border border-modal-border bg-modal-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 sm:p-7">
+            <h4 className="mb-4 text-lg font-extrabold tracking-tight text-modal-content sm:text-xl">Overview</h4>
+            <p className="case-study-copy text-[15px] font-medium leading-[1.8] sm:text-base">{project.description}</p>
+          </section>
 
-        <div className="mb-5 grid gap-4 sm:grid-cols-2 sm:gap-6">
-          <CaseStudySection title="Key Features" items={project.features} icon={FiChevronDown} tone="text-accent" />
-          <CaseStudySection title="Challenges" items={project.challenges} icon={FiExternalLink} tone="text-warning" />
-        </div>
-
-        <section className="mb-5 rounded-2xl border border-modal-border bg-modal-card p-4 sm:p-5">
-          <h4 className="flex items-center gap-2 text-base font-bold text-modal-content sm:text-lg">
-            <FiExternalLink className="h-4 w-4 text-primary" aria-hidden="true" />
-            Solutions
-          </h4>
-          <ul className="mt-3 space-y-2">
-            {project.solutions.map((item) => (
-              <li key={item} className="flex items-start gap-2.5 case-study-copy text-[15px] leading-7 text-modal-muted sm:text-base">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="rounded-2xl border border-modal-border bg-modal-card p-4 sm:p-5">
-          <div className="flex flex-wrap gap-2">
-          <h4 className="mb-1 w-full case-study-copy text-sm font-bold uppercase tracking-wider text-modal-muted">Tech Stack</h4>
-          {project.tech.map((t) => (
-            <span key={t} className="rounded-lg border border-modal-border bg-modal-bg px-3 py-1.5 case-study-copy text-xs font-semibold text-modal-muted">
-              {t}
-            </span>
-          ))}
+          <div className="grid gap-6 sm:grid-cols-2">
+            <CaseStudySection title="Key Features" items={project.features} icon={FiZap} tone="accent" />
+            <CaseStudySection title="Challenges" items={project.challenges} icon={FiAlertTriangle} tone="warning" />
           </div>
-        </section>
 
+          <section className="rounded-[20px] border border-modal-border bg-modal-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 sm:p-7">
+            <h4 className="mb-4 flex items-center gap-2.5 text-lg font-extrabold tracking-tight text-modal-content sm:text-xl">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/12 text-primary">
+                <FiCpu className="h-4 w-4" aria-hidden="true" />
+              </span>
+              Solutions
+            </h4>
+            <ul className="space-y-3">
+              {project.solutions.map((item) => (
+                <li key={item} className="flex items-start gap-3 case-study-copy text-[15px] font-medium leading-[1.8] sm:text-base">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/12 text-primary">
+                    <FiCheck className="h-3 w-3" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
 
+          <section className="rounded-[20px] border border-modal-border bg-modal-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 sm:p-7">
+            <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-modal-content">Tech Stack</h4>
+            <div className="flex flex-wrap gap-2.5">
+              {project.tech.map((t) => (
+                <span
+                  key={t}
+                  className="rounded-lg border border-modal-border bg-modal-bg px-3.5 py-2 text-sm font-semibold text-modal-content transition-colors duration-200 hover:border-primary/40 hover:text-primary"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </section>
+        </div>
       </div>
     </Modal>
   )
@@ -349,7 +378,10 @@ export default function Projects() {
         </div>
 
         {/* Grid */}
-        <motion.div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+        <motion.div
+          ref={gridRef}
+          className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+        >
           <AnimatePresence initial={false}>
             {filtered.map((project, i) => (
               <motion.div
