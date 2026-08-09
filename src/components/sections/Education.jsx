@@ -378,7 +378,7 @@ export default function Education({ onShowResults }) {
                   <p className="text-xs text-muted mt-0.5">Master of Computer Applications</p>
                 </div>
                 <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-primary/12 text-primary border border-primary/25">
-                  Sem 1 GPA 9.28
+                  Sem 2 GPA 9.62
                 </span>
               </div>
               <div className="grid sm:grid-cols-2 gap-3">

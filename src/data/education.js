@@ -9,10 +9,12 @@ export const educationTimeline = [
     summary:
       'Advanced study in software engineering, system design, and modern application development.',
     highlights: [
+      { icon: 'trophy', text: 'University Rank 2 in Semester 2' },
+      { icon: 'gpa', text: 'Sem 2 GPA: 9.62 / 10' },
       { icon: 'trophy', text: 'University Rank 3 in Semester 1' },
       { icon: 'gpa', text: 'Sem 1 GPA: 9.28 / 10' },
     ],
-    metric: { label: 'Sem 1 GPA', value: '9.28', pct: 92.8 },
+    metric: { label: 'Sem 2 GPA', value: '9.62', pct: 96.2 },
   },
   {
     id: 'bca',
@@ -43,7 +45,7 @@ export const bcaSemesters = [
 
 export const mcaSemesters = [
   { sem: 'Semester 1', gpa: '9.28', width: 92.8, rank: 'University Rank 3' },
-  { sem: 'Semester 2', gpa: 'Pursuing', width: 15, upcoming: true },
+  { sem: 'Semester 2', gpa: '9.62', width: 96.2, rank: 'University Rank 2' },
   { sem: 'Semester 3', gpa: 'Upcoming', width: 0, upcoming: true },
   { sem: 'Semester 4', gpa: 'Upcoming', width: 0, upcoming: true },
 ]
