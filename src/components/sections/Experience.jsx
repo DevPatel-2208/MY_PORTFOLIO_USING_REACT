@@ -1,9 +1,38 @@
-import { FiCalendar, FiCheckCircle } from 'react-icons/fi'
-import { FaUniversity } from 'react-icons/fa'
+import { FiCalendar, FiCheckCircle, FiExternalLink } from 'react-icons/fi'
+import { FaUniversity, FaGithub } from 'react-icons/fa'
 import { experience } from '../../data/experience'
 import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
 import Badge from '../ui/Badge'
+
+function ExperienceActions({ experience, layout = 'mobile' }) {
+  const base =
+    layout === 'mobile'
+      ? 'flex-1 justify-center text-[13px] px-3 py-2.5'
+      : 'flex-1 sm:flex-none sm:min-w-[180px] justify-center text-sm px-5 py-2.5'
+  return (
+    <div className="mt-5 pt-5 border-t border-border flex flex-col sm:flex-row gap-3">
+      <a
+        href={experience.liveUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`inline-flex items-center gap-2 rounded-xl font-semibold tracking-wide transition-all duration-300 hover:-translate-y-0.5 bg-gradient-accent text-white shadow-[0_12px_28px_-12px_var(--c-primary)] ${base}`}
+      >
+        <FiExternalLink className="w-4 h-4 shrink-0" aria-hidden="true" />
+        Live Demo
+      </a>
+      <a
+        href={experience.repoUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`inline-flex items-center gap-2 rounded-xl font-semibold tracking-wide transition-all duration-300 hover:-translate-y-0.5 border border-border-strong text-content bg-surface/40 hover:bg-surface-2 hover:border-primary/50 ${base}`}
+      >
+        <FaGithub className="w-4 h-4 shrink-0" aria-hidden="true" />
+        Source Code
+      </a>
+    </div>
+  )
+}
 
 function MobileExperienceCard({ experience }) {
   return (
@@ -70,6 +99,8 @@ function MobileExperienceCard({ experience }) {
           ))}
         </ul>
       </div>
+
+      <ExperienceActions experience={experience} layout="mobile" />
     </article>
   )
 }
@@ -150,6 +181,8 @@ export default function Experience() {
                   </span>
                 ))}
               </div>
+
+              <ExperienceActions experience={experience} layout="desktop" />
             </div>
           </Reveal>
         </div>

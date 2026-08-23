@@ -16,6 +16,8 @@ export const experience = {
     'Built and shipped production-grade features for a university-wide MCA Admission Assistant — conversational AI, secure REST APIs, and real-time analytics — within an R&D environment.',
   type: 'Internship',
   icon: FaFlask,
+  liveUrl: 'https://mca-admission-chatbot.netlify.app/',
+  repoUrl: 'https://github.com/DevPatel-2208/MCA_ADMISSION_ASSISTANT_CHATBOT',
   highlights: [
     {
       icon: FaRobot,
