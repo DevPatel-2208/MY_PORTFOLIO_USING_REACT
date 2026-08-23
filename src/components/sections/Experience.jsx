@@ -1,4 +1,5 @@
-import { FiCalendar, FiCheckCircle, FiExternalLink } from 'react-icons/fi'
+import { motion } from 'framer-motion'
+import { FiCalendar, FiCheckCircle, FiExternalLink, FiArrowUpRight } from 'react-icons/fi'
 import { FaUniversity, FaGithub } from 'react-icons/fa'
 import { experience } from '../../data/experience'
 import Reveal from '../ui/Reveal'
@@ -6,30 +7,45 @@ import SectionHeading from '../ui/SectionHeading'
 import Badge from '../ui/Badge'
 
 function ExperienceActions({ experience, layout = 'mobile' }) {
-  const base =
-    layout === 'mobile'
-      ? 'flex-1 justify-center text-[13px] px-3 py-2.5'
-      : 'flex-1 sm:flex-none sm:min-w-[180px] justify-center text-sm px-5 py-2.5'
+  const isMobile = layout === 'mobile'
+  const textSize = isMobile ? 'text-[13px]' : 'text-sm'
   return (
-    <div className="mt-5 pt-5 border-t border-border flex flex-col sm:flex-row gap-3">
-      <a
-        href={experience.liveUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`inline-flex items-center gap-2 rounded-xl font-semibold tracking-wide transition-all duration-300 hover:-translate-y-0.5 bg-gradient-accent text-white shadow-[0_12px_28px_-12px_var(--c-primary)] ${base}`}
-      >
-        <FiExternalLink className="w-4 h-4 shrink-0" aria-hidden="true" />
-        Live Demo
-      </a>
-      <a
-        href={experience.repoUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`inline-flex items-center gap-2 rounded-xl font-semibold tracking-wide transition-all duration-300 hover:-translate-y-0.5 border border-border-strong text-content bg-surface/40 hover:bg-surface-2 hover:border-primary/50 ${base}`}
-      >
-        <FaGithub className="w-4 h-4 shrink-0" aria-hidden="true" />
-        Source Code
-      </a>
+    <div className="mt-5 pt-5 border-t border-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Live Demo — primary gradient */}
+        <motion.a
+          href={experience.liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          whileHover={{ y: -3 }}
+          whileTap={{ scale: 0.98 }}
+          aria-label="Open live demo of the MCA Admission Assistant Chatbot"
+          className={`group relative overflow-hidden inline-flex items-center justify-center gap-2.5 rounded-2xl font-semibold tracking-wide ${textSize} px-4 py-3 bg-gradient-accent text-white shadow-[0_14px_30px_-12px_var(--c-primary)] ring-1 ring-inset ring-white/20`}
+        >
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-white/25 blur-md opacity-0 group-hover:opacity-100 group-hover:animate-shine transition-opacity duration-300"
+          />
+          <FiExternalLink className="w-4 h-4 shrink-0 relative z-10" aria-hidden="true" />
+          <span className="relative z-10">Live Demo</span>
+          <FiArrowUpRight className="w-4 h-4 shrink-0 relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+        </motion.a>
+
+        {/* Source Code — refined outline */}
+        <motion.a
+          href={experience.repoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          whileHover={{ y: -3 }}
+          whileTap={{ scale: 0.98 }}
+          aria-label="View source code on GitHub"
+          className={`group relative overflow-hidden inline-flex items-center justify-center gap-2.5 rounded-2xl font-semibold tracking-wide ${textSize} px-4 py-3 border border-border-strong text-content bg-surface/40 hover:bg-surface-2 hover:border-primary/50 hover:shadow-[0_0_22px_-10px_var(--c-primary)] transition-all duration-300`}
+        >
+          <FaGithub className="w-4 h-4 shrink-0 text-primary/90 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+          <span>Source Code</span>
+          <FiArrowUpRight className="w-4 h-4 shrink-0 opacity-0 -ml-1 translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" aria-hidden="true" />
+        </motion.a>
+      </div>
     </div>
   )
 }
