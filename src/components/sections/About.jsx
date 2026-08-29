@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { FiCode, FiServer, FiDatabase, FiCloud, FiShield, FiCpu } from 'react-icons/fi'
 import Reveal from '../ui/Reveal'
@@ -22,6 +23,67 @@ const terminalLines = [
 ]
 
 export default function About() {
+  const videoRef = useRef(null)
+
+  // Robust autoplay: attempt immediately, then retry when the page becomes
+  // visible / the user first interacts. Never blocks on a manual Play.
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    let active = true
+    let retryTimer = null
+
+    const tryPlay = () => {
+      if (!active || !video) return
+      video.muted = true
+      video.currentTime = 0
+      const p = video.play()
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => {
+          // Autoplay temporarily blocked — will retry on visibility/interaction.
+        })
+      }
+    }
+
+    tryPlay()
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        if (video.paused) tryPlay()
+      }
+    }
+    const onInteraction = () => {
+      if (video.paused) tryPlay()
+    }
+
+    document.addEventListener('visibilitychange', onVisibility)
+    window.addEventListener('pointerdown', onInteraction, { once: true })
+    window.addEventListener('keydown', onInteraction, { once: true })
+
+    // Cooldown retry in case the source needs a moment to be ready.
+    retryTimer = window.setInterval(() => {
+      if (video.readyState >= 2) {
+        if (video.paused) tryPlay()
+        window.clearInterval(retryTimer)
+      }
+    }, 500)
+
+    const onCanPlay = () => {
+      if (video.paused) tryPlay()
+    }
+    video.addEventListener('canplay', onCanPlay)
+
+    return () => {
+      active = false
+      if (retryTimer) window.clearInterval(retryTimer)
+      document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('pointerdown', onInteraction)
+      window.removeEventListener('keydown', onInteraction)
+      video.removeEventListener('canplay', onCanPlay)
+    }
+  }, [])
+
   return (
     <section id="about" className="relative py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,27 +100,38 @@ export default function About() {
           flex columns on desktop where the image + terminal group on the
           left and the text + skill cards sit on the right.
         */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.45fr_0.55fr] lg:items-start lg:gap-16">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.5fr_0.5fr] lg:items-start lg:gap-10">
           {/* Left column — portrait + terminal (grouped on desktop) */}
-          <div className="contents lg:order-1 lg:mx-auto lg:flex lg:w-full lg:max-w-[23rem] lg:flex-col lg:gap-6">
-            {/* Portrait */}
+          <div className="contents lg:order-1 lg:flex lg:w-full lg:flex-col lg:gap-6">
+            {/* Portrait — video card */}
             <Reveal direction="left" className="order-2 lg:order-none">
-              <div className="relative group w-full max-w-[15rem] mx-auto md:max-w-[19rem] lg:max-w-none">
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -6 }}
+                className="relative group w-full mx-auto md:max-w-[24rem] lg:max-w-none will-change-transform"
+              >
                 <div
-                  className="absolute inset-0 rounded-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: 'var(--glow-a)', filter: 'blur(60px)' }}
+                  className="absolute -inset-3 rounded-3xl opacity-50 transition-all duration-500 group-hover:opacity-90"
+                  style={{ background: 'var(--glow-a)', filter: 'blur(50px)' }}
                   aria-hidden="true"
                 />
-                <div className="gradient-border-card rounded-3xl p-1.5 glass shadow-soft">
-                  <img
-                    src="/2.jpeg"
-                    alt="Dev Patel portrait"
-                    className="w-full aspect-[4/5] object-cover rounded-3xl"
-                    width={400}
-                    height={500}
-                    loading="lazy"
-                    decoding="async"
-                  />
+                <div className="relative gradient-border-card rounded-3xl p-1.5 glass shadow-soft transition-all duration-500 group-hover:shadow-glow group-hover:border-primary/40 overflow-hidden">
+                  <div className="relative w-full overflow-hidden rounded-[calc(1.5rem-7px)]">
+                    <video
+                      ref={videoRef}
+                      src="/My_Intro.mp4"
+                      className="block h-auto w-full object-cover rounded-3xl transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="auto"
+                      disablePictureInPicture
+                    />
+                  </div>
                 </div>
 
                 <motion.div
@@ -82,7 +155,7 @@ export default function About() {
                     </span>
                   </span>
                 </motion.div>
-              </div>
+              </motion.div>
             </Reveal>
 
             {/* Terminal — attached directly below the portrait */}
