@@ -1,6 +1,15 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { FiCode, FiServer, FiDatabase, FiCloud, FiShield, FiCpu } from 'react-icons/fi'
+import {
+  FiCode,
+  FiServer,
+  FiDatabase,
+  FiCloud,
+  FiShield,
+  FiCpu,
+  FiVolume2,
+  FiVolumeX,
+} from 'react-icons/fi'
 import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
 import TerminalWindow from '../ui/terminal/TerminalWindow'
@@ -24,6 +33,7 @@ const terminalLines = [
 
 export default function About() {
   const videoRef = useRef(null)
+  const [muted, setMuted] = useState(true)
 
   // Robust autoplay: attempt immediately, then retry when the page becomes
   // visible / the user first interacts. Never blocks on a manual Play.
@@ -31,13 +41,20 @@ export default function About() {
     const video = videoRef.current
     if (!video) return
 
+    const userMutedRef = { current: true }
+    const applyMuted = () => {
+      video.muted = userMutedRef.current
+    }
+
     let active = true
     let retryTimer = null
 
     const tryPlay = () => {
       if (!active || !video) return
-      video.muted = true
-      video.currentTime = 0
+      // Keep the user's current preference (autoplay starts muted for
+      // browser policies, but the on-screen toggle can unmute afterward).
+      applyMuted()
+      if (video.currentTime > 0 && !video.ended) return
       const p = video.play()
       if (p && typeof p.catch === 'function') {
         p.catch(() => {
@@ -74,6 +91,13 @@ export default function About() {
     }
     video.addEventListener('canplay', onCanPlay)
 
+    // Keep the DOM muted state in sync when the user toggles it.
+    const onToggle = (e) => {
+      userMutedRef.current = e.detail?.muted ?? true
+      applyMuted()
+    }
+    window.addEventListener('about:video-mute', onToggle)
+
     return () => {
       active = false
       if (retryTimer) window.clearInterval(retryTimer)
@@ -81,8 +105,18 @@ export default function About() {
       window.removeEventListener('pointerdown', onInteraction)
       window.removeEventListener('keydown', onInteraction)
       video.removeEventListener('canplay', onCanPlay)
+      window.removeEventListener('about:video-mute', onToggle)
     }
   }, [])
+
+  const handleToggleMute = () => {
+    setMuted((prev) => {
+      const next = !prev
+      if (videoRef.current) videoRef.current.muted = next
+      window.dispatchEvent(new CustomEvent('about:video-mute', { detail: { muted: next } }))
+      return next
+    })
+  }
 
   return (
     <section id="about" className="relative py-20 md:py-28">
@@ -125,12 +159,25 @@ export default function About() {
                       src="/My_Intro.mp4"
                       className="block h-auto w-full object-cover rounded-3xl transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                       autoPlay
-                      muted
+                      muted={muted}
                       loop
                       playsInline
                       preload="auto"
                       disablePictureInPicture
                     />
+                    <button
+                      type="button"
+                      onClick={handleToggleMute}
+                      aria-label={muted ? 'Unmute video' : 'Mute video'}
+                      title={muted ? 'Turn sound on' : 'Turn sound off'}
+                      className="absolute right-3 bottom-3 z-10 grid h-10 w-10 cursor-pointer place-items-center rounded-full tech-badge text-content transition-all duration-300 hover:scale-110 hover:shadow-glow active:scale-95"
+                    >
+                      {muted ? (
+                        <FiVolumeX className="h-5 w-5" aria-hidden="true" />
+                      ) : (
+                        <FiVolume2 className="h-5 w-5" aria-hidden="true" />
+                      )}
+                    </button>
                   </div>
                 </div>
 
