@@ -1,0 +1,213 @@
+/* ============================================================
+   Custom cursor system
+   Only active when the html.custom-cursor class exists (JS gate).
+   ============================================================ */
+
+@media (pointer: fine) {
+  html.custom-cursor,
+  html.custom-cursor *,
+  html.custom-cursor *::before,
+  html.custom-cursor *::after {
+    cursor: none !important;
+  }
+}
+
+html.custom-cursor .cursor-layer {
+  display: block;
+}
+
+.cursor-layer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+/* Hidden state (keyboard navigation / leaving window) */
+.cursor-dot.is-hidden,
+.cursor-ring.is-hidden,
+.cursor-trail-dot.is-hidden {
+  opacity: 0;
+}
+.cursor-dot,
+.cursor-ring {
+  transition: opacity 0.2s ease;
+}
+
+/* ---- Inner dot ---- */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--c-primary);
+  box-shadow:
+    0 0 10px 2px color-mix(in srgb, var(--c-primary) 65%, transparent),
+    0 0 22px 6px color-mix(in srgb, var(--c-primary) 35%, transparent);
+  will-change: transform;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+html.custom-cursor .cursor-dot.is-down {
+  background: #ffffff;
+}
+
+/* ---- Outer ring ---- */
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 38px;
+  height: 38px;
+  will-change: transform;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.cursor-ring-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1.5px solid color-mix(in srgb, var(--c-primary) 55%, transparent);
+  background: transparent;
+  box-shadow:
+    0 0 14px -2px color-mix(in srgb, var(--c-primary) 45%, transparent),
+    inset 0 0 12px -4px color-mix(in srgb, var(--c-primary) 35%, transparent);
+  transition:
+    background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Interactive (buttons / links / cards / badges): grow + fill */
+.cursor-ring.is-interactive .cursor-ring-core,
+.cursor-ring.is-click .cursor-ring-core {
+  border-width: 2px;
+  border-color: color-mix(in srgb, var(--c-primary) 80%, transparent);
+  background: color-mix(in srgb, var(--c-primary) 14%, transparent);
+  box-shadow:
+    0 0 22px -4px color-mix(in srgb, var(--c-primary) 65%, transparent),
+    inset 0 0 18px -6px color-mix(in srgb, var(--c-primary) 45%, transparent);
+}
+
+.cursor-ring.is-view .cursor-ring-core,
+.cursor-ring.is-plus .cursor-ring-core {
+  border-width: 2.5px;
+  border-color: color-mix(in srgb, var(--c-primary) 90%, transparent);
+  background: color-mix(in srgb, var(--c-primary) 18%, transparent);
+}
+
+/* Text inputs: thin caret bar */
+.cursor-ring.is-text .cursor-ring-core {
+  width: 3px;
+  height: 24px;
+  border-radius: 999px;
+  border-width: 0;
+  background: var(--c-primary);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--c-primary) 60%, transparent);
+}
+
+/* Label (View / Click / +) */
+.cursor-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-content);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Idle glow pulse */
+.cursor-ring.is-idle .cursor-ring-core {
+  animation: cursor-idle-pulse 3.2s ease-in-out infinite;
+}
+
+/* Click ripple ring */
+.cursor-ripple {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--c-primary) 70%, transparent);
+  pointer-events: none;
+}
+
+/* Particle burst */
+.cursor-particle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c-primary) 85%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--c-primary) 60%, transparent);
+  pointer-events: none;
+}
+
+/* Trail dots */
+.cursor-trail-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c-primary) 45%, transparent);
+  will-change: transform;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+@keyframes cursor-idle-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 14px -2px color-mix(in srgb, var(--c-primary) 45%, transparent),
+      inset 0 0 12px -4px color-mix(in srgb, var(--c-primary) 35%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 26px -2px color-mix(in srgb, var(--c-primary) 70%, transparent),
+      inset 0 0 20px -4px color-mix(in srgb, var(--c-primary) 55%, transparent);
+  }
+}
+
+/* ---- Tablet: 30% smaller (fine pointers only) ---- */
+@media (pointer: fine) and (min-width: 768px) and (max-width: 1023.98px) {
+  .cursor-dot {
+    width: 5.6px;
+    height: 5.6px;
+  }
+  .cursor-ring {
+    width: 26.6px;
+    height: 26.6px;
+  }
+  .cursor-trail-dot {
+    width: 3.5px;
+    height: 3.5px;
+  }
+  .cursor-label {
+    font-size: 9px;
+  }
+}
+
+/* ---- Reduced motion / coarse pointers: never show ---- */
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .cursor-layer {
+    display: none !important;
+  }
+  html.custom-cursor,
+  html.custom-cursor *,
+  html.custom-cursor *::before,
+  html.custom-cursor *::after {
+    cursor: auto !important;
+  }
+}
