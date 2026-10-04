@@ -106,7 +106,7 @@ function ProfileCard({ profile, gh, onProof }) {
   const Icon = iconMap[profile.icon] || FiGithub
   return (
     <TiltCard className="h-full" max={14} scale={1.04} glareRadius="1rem">
-      <article className="group relative h-full rounded-2xl glass p-5 flex flex-col transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+      <article className="group spotlight relative h-full rounded-2xl glass p-5 flex flex-col transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
         <div
           className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
           style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 28px -10px var(--c-primary)' }}
@@ -118,7 +118,7 @@ function ProfileCard({ profile, gh, onProof }) {
             className="w-12 h-12 rounded-2xl grid place-items-center text-white shrink-0 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6 [transform:translateZ(0)] group-hover:[transform:translateZ(44px)]"
             style={{ background: `linear-gradient(135deg, ${profile.color}, ${profile.color}99)`, boxShadow: `0 10px 28px -10px ${profile.color}` }}
           >
-            <Icon className="w-6 h-6" aria-hidden="true" />
+            <Icon className="wiggle w-6 h-6" aria-hidden="true" />
           </span>
           <a
             href={profile.url}

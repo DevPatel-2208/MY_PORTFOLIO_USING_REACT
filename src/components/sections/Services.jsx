@@ -17,7 +17,7 @@ export default function Services() {
           {services.map((service, i) => (
             <Reveal key={service.id} delay={i * 0.07} amount={0.2} className="h-full">
               <TiltCard className="h-full" max={12} scale={1.03}>
-                <article className="group relative h-full rounded-3xl glass p-6 md:p-7 flex flex-col transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+                <article className="group spotlight relative h-full rounded-3xl glass p-6 md:p-7 flex flex-col transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
                   {/* Glow border on hover */}
                   <div
                     className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
@@ -26,7 +26,7 @@ export default function Services() {
                   />
 
                   <span className="relative w-12 h-12 rounded-2xl bg-gradient-accent grid place-items-center text-white shadow-glow mb-5 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6 [transform:translateZ(0)] group-hover:[transform:translateZ(46px)]">
-                    <service.icon className="w-6 h-6" aria-hidden="true" />
+                    <service.icon className="wiggle w-6 h-6" aria-hidden="true" />
                   </span>
 
                   <h4 className="relative text-base md:text-lg font-bold text-content leading-snug transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">

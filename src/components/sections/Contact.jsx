@@ -1,12 +1,14 @@
 import { useState, useRef } from 'react'
 import confetti from 'canvas-confetti'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMail, FiPhone, FiMapPin, FiSend, FiCheckCircle, FiAlertCircle, FiClock } from 'react-icons/fi'
+import { FiMail, FiPhone, FiMapPin, FiSend, FiCheckCircle, FiAlertCircle, FiClock, FiCopy, FiCheck } from 'react-icons/fi'
 import { site } from '../../data/site'
 import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
 import SocialLinks from '../ui/SocialLinks'
 import Button from '../ui/Button'
+import Magnetic from '../ui/Magnetic'
+import copyText from '../../utils/clipboard'
 
 const formspreeEndpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT || 'https://formspree.io/f/xdkdazaz'
 
@@ -53,6 +55,16 @@ export default function Contact() {
   const [status, setStatus] = useState('idle') // idle | sending | success | error
   const [errors, setErrors] = useState({})
   const [values, setValues] = useState({ name: '', email: '', subject: '', message: '' })
+  const [copied, setCopied] = useState(null)
+
+  const copyValue = async (item) => {
+    const ok = await copyText(item.value)
+    if (!ok) return
+    setCopied(item.label)
+    window.setTimeout(() => {
+      setCopied((cur) => (cur === item.label ? null : cur))
+    }, 1600)
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -116,17 +128,50 @@ export default function Contact() {
                     <span className="w-12 h-12 rounded-2xl bg-gradient-accent grid place-items-center text-white shadow-glow shrink-0">
                       <item.icon className="w-5 h-5" aria-hidden="true" />
                     </span>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <h5 className="font-bold text-content">{item.label}</h5>
-                      {item.href ? (
-                        <a
-                          href={item.href}
-                          className="text-sm text-muted hover:text-primary transition-colors break-all"
-                        >
-                          {item.value}
-                        </a>
-                      ) : (
-                        <p className="text-sm text-muted">{item.value}</p>
+                      <div className="flex items-center gap-1.5">
+                        {item.href ? (
+                          <a
+                            href={item.href}
+                            className="text-sm text-muted hover:text-primary transition-colors break-all min-w-0"
+                          >
+                            {item.value}
+                          </a>
+                        ) : (
+                          <p className="text-sm text-muted">{item.value}</p>
+                        )}
+                        {(item.label === 'Email' || item.label === 'Phone') && (
+                          <button
+                            type="button"
+                            onClick={() => copyValue(item)}
+                            aria-label={`Copy ${item.label} to clipboard`}
+                            className="shrink-0 w-7 h-7 rounded-lg grid place-items-center text-muted border border-border hover:text-primary hover:border-primary/40 hover:bg-primary/10 active:scale-90 transition-all duration-200 cursor-pointer focus-visible:outline-2 focus-visible:outline-primary"
+                          >
+                            <AnimatePresence mode="wait" initial={false}>
+                              <motion.span
+                                key={copied === item.label ? 'done' : 'copy'}
+                                initial={{ opacity: 0, scale: 0.5, rotate: -30 }}
+                                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                                exit={{ opacity: 0, scale: 0.5, rotate: 30 }}
+                                transition={{ duration: 0.16 }}
+                                className={`grid place-items-center ${copied === item.label ? 'text-accent' : ''}`}
+                                aria-hidden="true"
+                              >
+                                {copied === item.label ? (
+                                  <FiCheck className="w-3.5 h-3.5" aria-hidden="true" />
+                                ) : (
+                                  <FiCopy className="w-3.5 h-3.5" aria-hidden="true" />
+                                )}
+                              </motion.span>
+                            </AnimatePresence>
+                          </button>
+                        )}
+                      </div>
+                      {copied === item.label && (
+                        <span role="status" className="text-[11px] font-bold text-accent">
+                          Copied to clipboard
+                        </span>
                       )}
                       {item.sub && <p className="text-xs text-muted/80 mt-0.5">{item.sub}</p>}
                     </div>
@@ -236,7 +281,8 @@ export default function Contact() {
                 </div>
 
                 <div className="pt-1">
-                  <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={status === 'sending'}>
+                  <Magnetic strength={0.22} className="w-full sm:w-auto">
+                    <Button type="submit" size="lg" className="btn-beam w-full sm:w-auto" disabled={status === 'sending'}>
                     {status === 'sending' ? (
                       <>
                         <motion.span
@@ -254,6 +300,7 @@ export default function Contact() {
                       </>
                     )}
                   </Button>
+                  </Magnetic>
                 </div>
 
                 <AnimatePresence mode="wait">

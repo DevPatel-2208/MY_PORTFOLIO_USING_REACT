@@ -20,6 +20,7 @@ import { BsSun, BsMoon } from 'react-icons/bs'
 import useTheme from '../../hooks/useTheme'
 import useActiveSection from '../../hooks/useActiveSection'
 import useScrollLock, { useEscapeKey } from '../../hooks/useScrollLock'
+import { resumeBurst } from '../../utils/confetti'
 import { navLinks, site } from '../../data/site'
 import Button from '../ui/Button'
 import SocialLinks from '../ui/SocialLinks'
@@ -247,6 +248,7 @@ export default function Navbar({ onOpenPalette = () => {} }) {
               external
               size="sm"
               data-cursor="click"
+              onClick={resumeBurst}
               className="!hidden xl:!inline-flex min-h-10 !px-3.5 2xl:!px-4"
             >
               <FiDownload className="w-4 h-4" aria-hidden="true" />
@@ -439,6 +441,7 @@ export default function Navbar({ onOpenPalette = () => {} }) {
                     href={site.resume}
                     external
                     data-cursor="click"
+                    onClick={resumeBurst}
                     className="w-full !py-3.5"
                     size="lg"
                   >

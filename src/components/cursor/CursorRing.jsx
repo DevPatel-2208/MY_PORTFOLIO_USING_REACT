@@ -5,6 +5,8 @@ function ringClass(variant) {
     case 'click':
       return 'is-click'
     case 'view':
+    case 'open':
+    case 'play':
       return 'is-view'
     case 'plus':
       return 'is-plus'

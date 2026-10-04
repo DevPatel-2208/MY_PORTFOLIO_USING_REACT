@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { FiArrowUp, FiHeart, FiMail, FiMapPin, FiDownload, FiArrowRight } from 'react-icons/fi'
 import { navLinks, site } from '../../data/site'
 import SocialLinks from '../ui/SocialLinks'
+import { resumeBurst } from '../../utils/confetti'
 
 const exploreLinks = navLinks.slice(0, 5)
 const moreLinks = navLinks.slice(5)
@@ -110,7 +111,7 @@ export default function Footer() {
               </li>
             </ul>
 
-            <a href={site.resume} target="_blank" rel="noopener noreferrer" className="footer-cta group">
+            <a href={site.resume} target="_blank" rel="noopener noreferrer" onClick={resumeBurst} className="footer-cta group">
               <span className="footer-cta-icon">
                 <FiDownload className="w-4 h-4" aria-hidden="true" />
               </span>

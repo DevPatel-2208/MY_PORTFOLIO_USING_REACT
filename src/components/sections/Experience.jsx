@@ -20,7 +20,7 @@ export default function Experience() {
         <div className="max-w-4xl mx-auto">
           <Reveal>
             <TiltCard max={10} scale={1.015}>
-              <article className="group gradient-border-card relative rounded-3xl glass-strong p-6 md:p-10 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow [transform-style:preserve-3d]">
+              <article className="group spotlight gradient-border-card relative rounded-3xl glass-strong p-6 md:p-10 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow [transform-style:preserve-3d]">
                 {/* Glow border on hover */}
                 <div
                   className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
@@ -116,10 +116,10 @@ export default function Experience() {
                 {experience.highlights.map((h) => (
                   <li
                     key={h.title}
-                    className="group/hl flex items-start gap-3.5 rounded-2xl glass p-5 transition-all duration-500 hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow [transform:translateZ(0)] group-hover:[transform:translateZ(26px)] [transform-style:preserve-3d]"
+                    className="group/hl spotlight flex items-start gap-3.5 rounded-2xl glass p-5 transition-all duration-500 hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow [transform:translateZ(0)] group-hover:[transform:translateZ(26px)] [transform-style:preserve-3d]"
                   >
                     <span className="mt-0.5 w-10 h-10 shrink-0 rounded-xl bg-primary/12 text-primary grid place-items-center transition-transform duration-500 group-hover/hl:scale-110 group-hover/hl:rotate-6 [transform:translateZ(0)] group-hover:[transform:translateZ(44px)]">
-                      <h.icon className="w-5 h-5" aria-hidden="true" />
+                      <h.icon className="wiggle w-5 h-5" aria-hidden="true" />
                     </span>
                     <div className="min-w-0 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(36px)]">
                       <h4 className="text-sm font-bold text-content flex items-center gap-1.5">
