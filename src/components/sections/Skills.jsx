@@ -6,6 +6,7 @@ import {
 } from '../../data/skills'
 import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
+import TiltCard from '../ui/TiltCard'
 
 function MarqueeRow() {
   const doubled = [...techLogoList, ...techLogoList]
@@ -83,63 +84,96 @@ export default function Skills() {
         {/* Categories */}
         <div className="grid md:grid-cols-2 gap-5 mb-14">
           {skillCategories.map((category, catIndex) => (
-            <Reveal key={category.id} delay={catIndex * 0.06} amount={0.15}>
-              <div className="gradient-border-card h-full rounded-3xl glass p-6 md:p-7 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-glow group">
-                <div className="flex items-start gap-3.5 pb-5 mb-5 border-b border-border">
-                  <span className="w-12 h-12 shrink-0 rounded-2xl bg-gradient-accent grid place-items-center text-white shadow-glow transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105">
-                    <category.icon className="w-6 h-6" aria-hidden="true" />
-                  </span>
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-primary/12 text-primary border border-primary/25">
-                        {category.chip}
-                      </span>
-                    </div>
-                    <h3 className="text-base font-bold text-content leading-snug">{category.title}</h3>
-                    <p className="text-[12px] text-muted mt-0.5 leading-snug">{category.blurb}</p>
-                  </div>
-                </div>
+            <Reveal key={category.id} delay={catIndex * 0.06} amount={0.15} className="h-full">
+              <TiltCard className="h-full" max={11} scale={1.02}>
+                <article className="group gradient-border-card relative h-full rounded-3xl glass p-6 md:p-7 transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+                  {/* Glow border on hover */}
+                  <div
+                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
+                    style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 36px -12px var(--c-primary)' }}
+                    aria-hidden="true"
+                  />
 
-                <div className="grid gap-2.5">
-                  {category.skills.map((skill) => (
-                    <SkillBadge key={skill.name} skill={skill} />
-                  ))}
-                </div>
-              </div>
+                  <div className="relative flex items-start gap-3.5 pb-5 mb-5 border-b border-border [transform-style:preserve-3d]">
+                    <span className="w-12 h-12 shrink-0 rounded-2xl bg-gradient-accent grid place-items-center text-white shadow-glow transition-transform duration-500 ease-out group-hover:rotate-6 group-hover:scale-105 [transform:translateZ(0)] group-hover:[transform:translateZ(46px)]">
+                      <category.icon className="w-6 h-6" aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0 [transform-style:preserve-3d]">
+                      <div className="flex flex-wrap items-center gap-2 mb-1 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(34px)]">
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-primary/12 text-primary border border-primary/25">
+                          {category.chip}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-bold text-content leading-snug transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">
+                        {category.title}
+                      </h3>
+                      <p className="text-[12px] text-muted mt-0.5 leading-snug transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(22px)]">
+                        {category.blurb}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="relative grid gap-2.5 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(18px)]">
+                    {category.skills.map((skill) => (
+                      <SkillBadge key={skill.name} skill={skill} />
+                    ))}
+                  </div>
+                </article>
+              </TiltCard>
             </Reveal>
           ))}
         </div>
 
         {/* Tools & Platforms */}
         <Reveal className="mb-6">
-          <div className="gradient-border-card rounded-3xl glass-strong p-6 md:p-8">
-            <div className="mb-6">
-              <h4 className="text-lg font-bold text-content">Tools &amp; Platforms</h4>
-              <p className="text-xs text-muted mt-0.5">Version control, development tools, deployment, and testing.</p>
+          <TiltCard max={8} scale={1.01}>
+            <div className="group gradient-border-card relative rounded-3xl glass-strong p-6 md:p-8 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow [transform-style:preserve-3d]">
+              <div
+                className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
+                style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 36px -12px var(--c-primary)' }}
+                aria-hidden="true"
+              />
+              <div className="relative mb-6 [transform-style:preserve-3d]">
+                <h4 className="text-lg font-bold text-content transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">
+                  Tools &amp; Platforms
+                </h4>
+                <p className="text-xs text-muted mt-0.5 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(22px)]">
+                  Version control, development tools, deployment, and testing.
+                </p>
+              </div>
+              <div className="relative grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(16px)]">
+                {toolsAndPlatforms.map((tool) => (
+                  <ToolPill key={tool.name} tool={tool} />
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {toolsAndPlatforms.map((tool) => (
-                <ToolPill key={tool.name} tool={tool} />
-              ))}
-            </div>
-          </div>
+          </TiltCard>
         </Reveal>
 
         {/* Additional Languages */}
         <Reveal delay={0.05}>
-          <div className="gradient-border-card rounded-3xl glass-strong p-6 md:p-8">
-            <div className="mb-6">
-              <h4 className="text-lg font-bold text-content">Additional Languages</h4>
-              <p className="text-xs text-muted mt-0.5">
-                Core programming languages for problem-solving and system development.
-              </p>
+          <TiltCard max={8} scale={1.01}>
+            <div className="group gradient-border-card relative rounded-3xl glass-strong p-6 md:p-8 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow [transform-style:preserve-3d]">
+              <div
+                className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
+                style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 36px -12px var(--c-primary)' }}
+                aria-hidden="true"
+              />
+              <div className="relative mb-6 [transform-style:preserve-3d]">
+                <h4 className="text-lg font-bold text-content transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">
+                  Additional Languages
+                </h4>
+                <p className="text-xs text-muted mt-0.5 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(22px)]">
+                  Core programming languages for problem-solving and system development.
+                </p>
+              </div>
+              <div className="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(16px)]">
+                {additionalLanguages.map((lang) => (
+                  <ToolPill key={lang.name} tool={lang} />
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              {additionalLanguages.map((lang) => (
-                <ToolPill key={lang.name} tool={lang} />
-              ))}
-            </div>
-          </div>
+          </TiltCard>
         </Reveal>
       </div>
     </section>

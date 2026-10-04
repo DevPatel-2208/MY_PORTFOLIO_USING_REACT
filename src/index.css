@@ -723,6 +723,146 @@
   text-shadow: 0 0 14px color-mix(in srgb, var(--c-primary) 28%, transparent);
 }
 
+/* ── Revolving orbit dot around the avatar ─────────────────────── */
+.pl-avatar-ring {
+  position: relative;
+}
+
+.pl-orbit {
+  position: absolute;
+  inset: -9px;
+  border-radius: 9999px;
+  border: 1px dashed color-mix(in srgb, var(--c-primary) 45%, transparent);
+  animation: pl-spin 3.4s linear infinite;
+  pointer-events: none;
+}
+
+.pl-orbit-dot {
+  position: absolute;
+  top: -3.5px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 9999px;
+  background: var(--c-accent);
+  box-shadow:
+    0 0 10px 2px color-mix(in srgb, var(--c-accent) 70%, transparent),
+    0 0 22px 4px color-mix(in srgb, var(--c-primary) 40%, transparent);
+}
+
+@keyframes pl-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Name letters (framer animates rise + flip) ────────────────── */
+.pl-letter {
+  display: inline-block;
+  transform-style: preserve-3d;
+  background-image: linear-gradient(120deg, var(--heading-start), var(--heading-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Boot step checklist ───────────────────────────────────────── */
+.pl-steps {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.95rem;
+}
+
+.pl-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  background: color-mix(in srgb, var(--c-muted) 10%, transparent);
+  border: 1px solid var(--c-border);
+  opacity: 0.55;
+  transition: opacity 0.35s ease, color 0.35s ease, background-color 0.35s ease,
+    border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.pl-step-tick {
+  width: 0.7rem;
+  height: 0.7rem;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pl-step.is-done {
+  opacity: 1;
+  color: var(--c-primary);
+  background: color-mix(in srgb, var(--c-primary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--c-primary) 35%, transparent);
+  box-shadow: 0 0 16px -6px color-mix(in srgb, var(--c-primary) 55%, transparent);
+}
+
+.pl-step.is-done .pl-step-tick {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Glowing tip dot riding the fill end ───────────────────────── */
+.pl-track {
+  position: relative;
+}
+
+.pl-tip {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  margin-left: -5px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow:
+    0 0 8px 2px color-mix(in srgb, var(--c-secondary) 80%, transparent),
+    0 0 18px 5px color-mix(in srgb, var(--c-primary) 55%, transparent);
+  pointer-events: none;
+  transition: left 0.15s linear;
+}
+
+/* ── Stack strip ───────────────────────────────────────────────── */
+.pl-stack {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.7rem;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--c-border);
+}
+
+.pl-stack-item {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  opacity: 0.75;
+}
+
+.pl-stack-item + .pl-stack-item::before {
+  content: "·";
+  margin-right: 0.7rem;
+  color: var(--c-primary);
+}
+
 /* Short landscape phones: compact card, still margin:auto centered */
 @media (max-height: 560px) and (orientation: landscape) {
   .pl-avatar-ring {
@@ -744,8 +884,13 @@
 @media (prefers-reduced-motion: reduce) {
   .pl-blob,
   .pl-shine,
-  .pl-status-dot {
+  .pl-status-dot,
+  .pl-orbit {
     animation: none;
+  }
+
+  .pl-tip {
+    transition: none;
   }
 }
 
@@ -1169,6 +1314,116 @@
   outline-offset: 2px;
 }
 
+/* 3D tilt layer — the pill floats above the lifting video frame */
+.about-video-sound--float {
+  transform: translateZ(0);
+}
+
+.group:hover .about-video-sound--float {
+  transform: translateZ(52px);
+}
+
+.group:hover .about-video-sound--float:active {
+  transform: translateZ(52px) scale(0.95);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Command palette (Cmd+K) — kbd chips + match highlight
+   ═══════════════════════════════════════════════════════════════════ */
+.cmdk-kbd {
+  /* NOTE: no `display` here on purpose — visibility is controlled by
+     Tailwind (`hidden md:inline-flex` etc.). An unlayered display rule
+     would beat `hidden` and leak the chip onto mobile headers. */
+  align-items: center;
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c-muted);
+  background: color-mix(in srgb, var(--c-muted) 10%, transparent);
+  border: 1px solid var(--c-border);
+  box-shadow: 0 1px 0 var(--c-border-strong);
+}
+
+.cmdk-mark {
+  background: transparent;
+  color: var(--c-primary);
+  font-weight: 800;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Practice streak badge — flame with flicker + travelling pulse
+   ═══════════════════════════════════════════════════════════════════ */
+.streak-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.85rem 0.45rem 0.5rem;
+  border-radius: 999px;
+  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: linear-gradient(135deg, #f97316, #ef4444 60%, #dc2626);
+  border: 1px solid color-mix(in srgb, #fb923c 60%, transparent);
+  box-shadow:
+    0 8px 24px -8px rgba(249, 115, 22, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.streak-flame {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.25);
+  animation: flame-flicker 1.6s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1) rotate(-3deg); }
+  30% { transform: scale(1.12) rotate(3deg); }
+  60% { transform: scale(0.94) rotate(-2deg); }
+}
+
+.streak-count {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+.streak-pulse {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -40%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: skewX(-18deg);
+  animation: streak-sweep 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes streak-sweep {
+  0% { transform: translateX(0) skewX(-18deg); }
+  60%, 100% { transform: translateX(420%) skewX(-18deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streak-flame,
+  .streak-pulse {
+    animation: none;
+  }
+}
+
 @media (min-width: 640px) {
   .about-video-sound {
     right: 1rem;
@@ -1234,6 +1489,29 @@ main {
 
 .hero-tilt .tilt-glare {
   inset: var(--photo-inset, 40px);
+}
+
+/* ── Periodic light sweep across the portrait ──
+   Clipped to the photo circle by the parent's overflow + radius. */
+.hero-photo-shine {
+  position: absolute;
+  inset: -25%;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: 9999px;
+  background: linear-gradient(
+    115deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.24) 50%,
+    transparent 58%
+  );
+  transform: translateX(-75%);
+  animation: hero-shine 6.5s ease-in-out infinite;
+}
+
+@keyframes hero-shine {
+  0%, 52% { transform: translateX(-75%); }
+  88%, 100% { transform: translateX(75%); }
 }
 
 /* Rotating dashed ring — the outer orbit boundary */
