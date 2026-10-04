@@ -27,6 +27,7 @@ import { FaTrophy } from 'react-icons/fa'
 import { navLinks, site } from '../../data/site'
 import useTheme from '../../hooks/useTheme'
 import useScrollLock, { useEscapeKey } from '../../hooks/useScrollLock'
+import { popCenter } from '../../utils/confetti'
 
 const RECENT_KEY = 'portfolio-palette-recent'
 const PLAY_INTRO_EVENT = 'portfolio:play-intro'
@@ -150,7 +151,10 @@ function buildCommands({ isLight, toggleTheme }) {
       hint: 'PDF',
       icon: FiDownload,
       keywords: 'resume cv download pdf hire',
-      run: () => window.open(site.resume, '_blank', 'noopener'),
+      run: () => {
+        popCenter()
+        window.open(site.resume, '_blank', 'noopener')
+      },
     },
     {
       id: 'copy-email',

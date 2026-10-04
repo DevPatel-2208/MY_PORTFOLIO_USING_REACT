@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { FiArrowRight, FiDownload, FiMapPin, FiMousePointer } from 'react-icons/fi'
 import { SiReact, SiNodedotjs, SiMongodb, SiExpress } from 'react-icons/si'
 import { typedRoles, heroStats, site } from '../../data/site'
@@ -7,6 +7,8 @@ import SocialLinks from '../ui/SocialLinks'
 import AnimatedNumber from '../ui/AnimatedNumber'
 import Button from '../ui/Button'
 import TiltCard from '../ui/TiltCard'
+import Magnetic from '../ui/Magnetic'
+import { resumeBurst } from '../../utils/confetti'
 
 function useTypewriter(words) {
   const [text, setText] = useState('')
@@ -89,6 +91,12 @@ export default function Hero() {
   const typed = useTypewriter(typedRoles)
   const reduce = useReducedMotion()
 
+  /* Scroll parallax — portrait drifts down slow, intro lifts away.
+     Subtle depth cue; disabled with reduced motion. */
+  const { scrollYProgress } = useScroll()
+  const orbitY = useTransform(scrollYProgress, [0, 0.15], [0, 110])
+  const introY = useTransform(scrollYProgress, [0, 0.15], [0, -70])
+
   const container = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
@@ -136,6 +144,7 @@ export default function Hero() {
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            style={reduce ? undefined : { y: orbitY }}
             className="order-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:self-center relative flex items-center justify-center mt-6 lg:mt-0"
           >
             <TiltCard className="hero-tilt" max={11} scale={1.035} glareRadius="9999px">
@@ -198,7 +207,12 @@ export default function Hero() {
 
           {/* Intro */}
           <div className="order-3 lg:order-none lg:col-start-1 lg:row-start-2 text-center lg:text-left">
-            <motion.div variants={container} initial="hidden" animate="visible">
+            <motion.div
+              variants={container}
+              initial="hidden"
+              animate="visible"
+              style={reduce ? undefined : { y: introY }}
+            >
               <motion.p variants={item} className="mt-6 text-lg md:text-xl text-muted">
                 Hi there, I'm
               </motion.p>
@@ -241,22 +255,28 @@ export default function Hero() {
                 variants={item}
                 className="mt-7 flex flex-wrap items-center justify-center lg:justify-start gap-3"
               >
-                <Button href="#contact" size="lg">
-                  Hire Me
-                  <FiArrowRight className="w-4 h-4" aria-hidden="true" />
-                </Button>
-                <Button href="#projects" variant="outline" size="lg">
-                  View Projects
-                </Button>
-                <motion.a
-                  href={site.resume}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cursor="click"
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="group relative inline-flex items-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-semibold tracking-wide text-content transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
+                <Magnetic>
+                  <Button href="#contact" size="lg" className="btn-beam">
+                    Hire Me
+                    <FiArrowRight className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                </Magnetic>
+                <Magnetic>
+                  <Button href="#projects" variant="outline" size="lg">
+                    View Projects
+                  </Button>
+                </Magnetic>
+                <Magnetic>
+                  <motion.a
+                    href={site.resume}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-cursor="click"
+                    onClick={resumeBurst}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="btn-beam group relative inline-flex items-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-semibold tracking-wide text-content transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
                   <span
                     aria-hidden="true"
                     className="absolute inset-0 rounded-xl p-px bg-gradient-to-r from-primary/70 via-secondary/70 to-primary/70 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
@@ -275,6 +295,7 @@ export default function Hero() {
                   </span>
                   <span className="relative">Resume</span>
                 </motion.a>
+                </Magnetic>
               </motion.div>
             </motion.div>
           </div>

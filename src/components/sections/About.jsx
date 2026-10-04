@@ -107,7 +107,7 @@ export default function About() {
                     aria-hidden="true"
                   />
                   {/* Frame lifts as one surface; the sound pill floats above it */}
-                  <div className="gradient-border-card relative rounded-3xl p-1.5 glass transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(28px)]">
+                  <div data-cursor="play" className="gradient-border-card spotlight relative rounded-3xl p-1.5 glass transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(28px)]">
                     <div className="about-video-wrap rounded-3xl">
                       <video
                         ref={videoRef}
@@ -125,6 +125,7 @@ export default function About() {
                     <button
                       type="button"
                       onClick={toggleSound}
+                      data-cursor="click"
                       aria-label={muted ? 'Unmute video' : 'Mute video'}
                       aria-pressed={!muted}
                       className="about-video-sound about-video-sound--float"
@@ -188,14 +189,14 @@ export default function About() {
               {highlights.map((item, i) => (
                 <Reveal key={item.label} delay={i * 0.05} amount={0.3} className="h-full">
                   <TiltCard className="h-full" max={16} scale={1.06} glareRadius="1rem">
-                    <div className="group relative h-full rounded-2xl glass p-4 text-center transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+                    <div className="group spotlight relative h-full rounded-2xl glass p-4 text-center transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
                       <div
                         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
                         style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 28px -10px var(--c-primary)' }}
                         aria-hidden="true"
                       />
                       <div className="relative mx-auto mb-2.5 w-10 h-10 rounded-xl bg-primary/12 grid place-items-center text-primary transition-transform duration-500 ease-out group-hover:scale-110 [transform:translateZ(0)] group-hover:[transform:translateZ(40px)]">
-                        <item.icon className="w-5 h-5" aria-hidden="true" />
+                        <item.icon className="wiggle w-5 h-5" aria-hidden="true" />
                       </div>
                       <div className="relative text-sm font-bold text-content transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(28px)]">
                         {item.label}

@@ -1424,6 +1424,170 @@
   }
 }
 
+/* Rotating conic angle for the button beam (graceful static fallback) */
+@property --beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Micro-interaction system — border beam, spotlight, icon wiggle,
+   marquee control, odometer digits
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Border beam: a light that travels around primary buttons ── */
+.btn-beam {
+  position: relative;
+  isolation: isolate;
+}
+
+.btn-beam::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--beam-angle, 0deg),
+    transparent 0deg,
+    transparent 250deg,
+    color-mix(in srgb, #ffffff 85%, transparent) 290deg,
+    var(--c-secondary) 320deg,
+    transparent 340deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: beam-rotate 3.2s linear infinite;
+}
+
+.btn-beam:hover::after,
+.btn-beam:focus-visible::after {
+  opacity: 1;
+}
+
+@keyframes beam-rotate {
+  to { --beam-angle: 360deg; }
+}
+
+/* ── Spotlight: mouse-following wash on .spotlight cards ──
+   Uses ::after so it never fights .gradient-border-card::before. */
+.spotlight {
+  position: relative;
+}
+
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--c-primary) 13%, transparent),
+    transparent 65%
+  );
+}
+
+.spotlight:hover::after {
+  opacity: 1;
+}
+
+/* ── Icon wiggle: one playful shake per hover ── */
+.group:hover .wiggle {
+  animation: wiggle-shake 0.5s ease;
+}
+
+@keyframes wiggle-shake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-11deg) scale(1.12); }
+  50% { transform: rotate(9deg) scale(1.06); }
+  75% { transform: rotate(-5deg) scale(1.1); }
+}
+
+/* ── Marquee: pause on hover + reverse lane ── */
+.marquee-track {
+  animation: marquee 30s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-track--reverse {
+  animation: marquee-rev 38s linear infinite;
+}
+
+@keyframes marquee-rev {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+/* ── Odometer digits ── */
+.odo {
+  display: inline-flex;
+  align-items: baseline;
+  font-variant-numeric: tabular-nums;
+}
+
+.odo-digit {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  vertical-align: baseline;
+  line-height: 1;
+}
+
+.odo-strip {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.12s linear;
+  will-change: transform;
+}
+
+.odo-num {
+  display: block;
+  height: 1em;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-beam::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .group:hover .wiggle {
+    animation: none;
+  }
+
+  .marquee-track,
+  .marquee-track--reverse {
+    animation: none;
+  }
+
+  .spotlight:hover::after {
+    opacity: 0;
+  }
+
+  .odo-strip {
+    transition: none;
+  }
+}
+
 @media (min-width: 640px) {
   .about-video-sound {
     right: 1rem;

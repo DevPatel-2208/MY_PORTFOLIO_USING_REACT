@@ -55,7 +55,7 @@ export default function Certificates() {
             <Reveal key={cert.id} delay={(i % 3) * 0.06} amount={0.15} className="h-full">
               <TiltCard className="h-full" max={11} scale={1.02}>
                 <article
-                  className="group relative h-full rounded-3xl glass transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 flex flex-col cursor-pointer [transform-style:preserve-3d]"
+                  className="group spotlight relative h-full rounded-3xl glass transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 flex flex-col cursor-pointer [transform-style:preserve-3d]"
                   onClick={() => setSelected(cert)}
                   tabIndex={0}
                   onKeyDown={(e) => {

@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
 import { FiBookOpen, FiAward, FiStar, FiFileText } from 'react-icons/fi'
 import { HiAcademicCap } from 'react-icons/hi2'
 import { FaTrophy } from 'react-icons/fa'
@@ -25,7 +26,7 @@ const timelineLine =
 
 function EducationCard({ item }) {
   return (
-    <article className="group gradient-border-card relative rounded-3xl glass p-5 sm:p-6 md:p-8 transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+    <article className="group spotlight gradient-border-card relative rounded-3xl glass p-5 sm:p-6 md:p-8 transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
       {/* Glow border on hover */}
       <div
         className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
@@ -91,7 +92,7 @@ function SemesterCard({ sem, gpa, width, rank, upcoming, index }) {
   return (
     <Reveal delay={index * 0.05} amount={0.3} className="h-full">
       <TiltCard className="h-full" max={14} scale={1.04}>
-        <div className="group relative h-full rounded-2xl glass p-5 transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+        <div className="group spotlight relative h-full rounded-2xl glass p-5 transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
           <div
             className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
             style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 28px -10px var(--c-primary)' }}
@@ -173,6 +174,14 @@ function TimelineEndpoint({ reduceMotion }) {
 
 export default function Education({ onShowResults }) {
   const reduceMotion = useReducedMotion()
+  const railWrapRef = useRef(null)
+
+  /* Rail draws itself as the timeline scrolls through the viewport */
+  const { scrollYProgress } = useScroll({
+    target: railWrapRef,
+    offset: ['start 0.8', 'end 0.55'],
+  })
+  const railScale = useSpring(scrollYProgress, { stiffness: 90, damping: 24 })
 
   return (
     <section id="education" className="relative py-20 md:py-28">
@@ -184,17 +193,21 @@ export default function Education({ onShowResults }) {
         />
 
         {/* Timeline — three independent layers */}
-        <div className="relative max-w-5xl mx-auto">
-          {/* Layer 1: continuous vertical line (left rail, stays inside container) */}
-          <motion.div
-            initial={reduceMotion ? false : { scaleY: 0 }}
-            whileInView={reduceMotion ? undefined : { scaleY: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-            className="education-rail-line"
-            style={{ background: timelineLine }}
-            aria-hidden="true"
-          />
+        <div ref={railWrapRef} className="relative max-w-5xl mx-auto">
+          {/* Layer 1: continuous vertical line grows with scroll */}
+          {reduceMotion ? (
+            <div
+              className="education-rail-line"
+              style={{ background: timelineLine }}
+              aria-hidden="true"
+            />
+          ) : (
+            <motion.div
+              style={{ scaleY: railScale, background: timelineLine }}
+              className="education-rail-line"
+              aria-hidden="true"
+            />
+          )}
 
           {/* Layer 2 + 3: rows (icon | gap | card) */}
           {educationTimeline.map((item, i) => (

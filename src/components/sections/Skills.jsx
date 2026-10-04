@@ -8,14 +8,20 @@ import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
 import TiltCard from '../ui/TiltCard'
 
-function MarqueeRow() {
-  const doubled = [...techLogoList, ...techLogoList]
+function MarqueeRow({ items, reverse = false, duration = 30 }) {
+  const doubled = [...items, ...items]
   return (
-    <div className="relative overflow-hidden py-2 mb-12 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
-      <div className="flex gap-4 w-max" style={{ animation: 'marquee 30s linear infinite' }}>
+    <div
+      className="marquee relative overflow-hidden py-2 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
+    >
+      <div
+        className={`flex gap-4 w-max ${reverse ? 'marquee-track--reverse' : 'marquee-track'}`}
+        style={{ animationDuration: `${duration}s` }}
+      >
         {doubled.map((tech, i) => (
           <div
             key={`${tech.name}-${i}`}
+            aria-hidden={i >= items.length}
             className="flex items-center gap-2.5 px-5 py-3 rounded-2xl glass text-sm font-semibold text-muted whitespace-nowrap"
           >
             <tech.icon className="w-5 h-5 text-primary" aria-hidden="true" />
@@ -31,7 +37,7 @@ function SkillBadge({ skill }) {
   return (
     <div className="group flex items-center gap-3 rounded-2xl glass p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow">
       <span className="w-11 h-11 shrink-0 rounded-xl bg-primary/12 text-primary grid place-items-center transition-transform duration-300 group-hover:scale-110">
-        <skill.icon className="w-5 h-5" aria-hidden="true" />
+        <skill.icon className="wiggle w-5 h-5" aria-hidden="true" />
       </span>
       <div className="min-w-0">
         <div className="text-sm font-bold text-content truncate">{skill.name}</div>
@@ -45,7 +51,7 @@ function ToolPill({ tool }) {
   return (
     <div className="group flex items-center gap-3 rounded-2xl glass p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow">
       <span className="w-10 h-10 shrink-0 rounded-xl bg-accent/12 text-accent grid place-items-center transition-transform duration-300 group-hover:scale-110">
-        <tool.icon className="w-5 h-5" aria-hidden="true" />
+        <tool.icon className="wiggle w-5 h-5" aria-hidden="true" />
       </span>
       <div className="min-w-0">
         <div className="text-sm font-bold text-content truncate">{tool.name}</div>
@@ -65,7 +71,10 @@ export default function Skills() {
           description="A modern toolkit for building full-stack products — from polished interfaces to robust backends and AI-powered features."
         />
 
-        <MarqueeRow />
+        <div className="mb-12 space-y-3">
+          <MarqueeRow items={techLogoList} duration={30} />
+          <MarqueeRow items={toolsAndPlatforms} reverse duration={42} />
+        </div>
 
         {/* Specialization */}
         <Reveal className="text-center mb-6">
@@ -86,7 +95,7 @@ export default function Skills() {
           {skillCategories.map((category, catIndex) => (
             <Reveal key={category.id} delay={catIndex * 0.06} amount={0.15} className="h-full">
               <TiltCard className="h-full" max={11} scale={1.02}>
-                <article className="group gradient-border-card relative h-full rounded-3xl glass p-6 md:p-7 transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+                <article className="group spotlight gradient-border-card relative h-full rounded-3xl glass p-6 md:p-7 transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
                   {/* Glow border on hover */}
                   <div
                     className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
@@ -96,7 +105,7 @@ export default function Skills() {
 
                   <div className="relative flex items-start gap-3.5 pb-5 mb-5 border-b border-border [transform-style:preserve-3d]">
                     <span className="w-12 h-12 shrink-0 rounded-2xl bg-gradient-accent grid place-items-center text-white shadow-glow transition-transform duration-500 ease-out group-hover:rotate-6 group-hover:scale-105 [transform:translateZ(0)] group-hover:[transform:translateZ(46px)]">
-                      <category.icon className="w-6 h-6" aria-hidden="true" />
+                      <category.icon className="wiggle w-6 h-6" aria-hidden="true" />
                     </span>
                     <div className="min-w-0 [transform-style:preserve-3d]">
                       <div className="flex flex-wrap items-center gap-2 mb-1 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(34px)]">
@@ -127,7 +136,7 @@ export default function Skills() {
         {/* Tools & Platforms */}
         <Reveal className="mb-6">
           <TiltCard max={8} scale={1.01}>
-            <div className="group gradient-border-card relative rounded-3xl glass-strong p-6 md:p-8 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow [transform-style:preserve-3d]">
+            <div className="group spotlight gradient-border-card relative rounded-3xl glass-strong p-6 md:p-8 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow [transform-style:preserve-3d]">
               <div
                 className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
                 style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 36px -12px var(--c-primary)' }}
@@ -153,7 +162,7 @@ export default function Skills() {
         {/* Additional Languages */}
         <Reveal delay={0.05}>
           <TiltCard max={8} scale={1.01}>
-            <div className="group gradient-border-card relative rounded-3xl glass-strong p-6 md:p-8 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow [transform-style:preserve-3d]">
+            <div className="group spotlight gradient-border-card relative rounded-3xl glass-strong p-6 md:p-8 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow [transform-style:preserve-3d]">
               <div
                 className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
                 style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 36px -12px var(--c-primary)' }}

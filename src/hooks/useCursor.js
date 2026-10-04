@@ -9,6 +9,8 @@ const LABELS = {
   card: '',
   click: 'Click',
   view: 'View',
+  open: 'Open',
+  play: 'Play',
   plus: '+',
   text: '',
 }

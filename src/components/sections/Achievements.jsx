@@ -113,7 +113,7 @@ function AchievementCard({ card, variants }) {
         />
 
         {/* Card body — overflow-hidden removed so the 3D layers can lift */}
-        <div className="relative h-full rounded-3xl border border-border bg-surface-2/95 dark:bg-[rgba(20,24,38,0.88)] backdrop-blur-xl p-7 flex flex-col shadow-soft transition-all duration-500 group-hover:border-secondary/50 group-hover:bg-white dark:group-hover:bg-[rgba(26,30,47,0.93)] group-hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.25)] dark:group-hover:shadow-[0_20px_50px_rgba(139,92,246,0.18)] [transform-style:preserve-3d]">
+        <div className="spotlight relative h-full rounded-3xl border border-border bg-surface-2/95 dark:bg-[rgba(20,24,38,0.88)] backdrop-blur-xl p-7 flex flex-col shadow-soft transition-all duration-500 group-hover:border-secondary/50 group-hover:bg-white dark:group-hover:bg-[rgba(26,30,47,0.93)] group-hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.25)] dark:group-hover:shadow-[0_20px_50px_rgba(139,92,246,0.18)] [transform-style:preserve-3d]">
           {/* Top row: badge + arrow */}
           <div className="relative flex items-center justify-between gap-3 mb-5 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">
             <span
@@ -149,7 +149,7 @@ function AchievementCard({ card, variants }) {
                 boxShadow: `0 10px 30px -8px ${gradient.glow}`,
               }}
             >
-              <Icon className="w-6 h-6" aria-hidden="true" />
+              <Icon className="wiggle w-6 h-6" aria-hidden="true" />
             </div>
           </div>
 
@@ -355,7 +355,8 @@ export default function Achievements() {
                 <button
                   type="button"
                   onClick={() => setSelected(img)}
-                  className="group relative block w-full rounded-2xl cursor-pointer border border-border bg-surface-2 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow focus-visible:outline-2 focus-visible:outline-primary [transform-style:preserve-3d]"
+                  data-cursor="open"
+                  className="group spotlight relative block w-full rounded-2xl cursor-pointer border border-border bg-surface-2 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow focus-visible:outline-2 focus-visible:outline-primary [transform-style:preserve-3d]"
                   style={{ aspectRatio: '4 / 5' }}
                   aria-label={`View ${img.caption} (${img.label})`}
                 >

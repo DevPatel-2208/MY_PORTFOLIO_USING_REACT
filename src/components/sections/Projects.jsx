@@ -57,7 +57,7 @@ const ProjectCard = memo(function ProjectCard({ project, index, onOpenCase }) {
       <TiltCard className="h-full" max={13} scale={1.025}>
         <article
           data-cursor="plus"
-          className="group relative h-full rounded-3xl glass transition-[box-shadow,border-color,background-color] duration-500 hover:shadow-glow hover:border-primary/40 hover:bg-surface-2/70 flex flex-col [transform-style:preserve-3d]"
+          className="group spotlight relative h-full rounded-3xl glass transition-[box-shadow,border-color,background-color] duration-500 hover:shadow-glow hover:border-primary/40 hover:bg-surface-2/70 flex flex-col [transform-style:preserve-3d]"
         >
           {/* Glow border on hover */}
           <div

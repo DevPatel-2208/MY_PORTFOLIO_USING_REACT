@@ -10,6 +10,7 @@ import Preloader from './components/layout/Preloader'
 import SEO from './components/seo/SEO'
 import CommandPalette from './components/ui/CommandPalette'
 import usePaletteHotkey from './hooks/usePaletteHotkey'
+import useSpotlight from './hooks/useSpotlight'
 
 const Hero = lazy(() => import('./components/sections/Hero'))
 const About = lazy(() => import('./components/sections/About'))
@@ -47,6 +48,7 @@ function App() {
   const openPalette = useCallback(() => setPaletteOpen(true), [])
 
   usePaletteHotkey(togglePalette)
+  useSpotlight()
 
   return (
     <>
