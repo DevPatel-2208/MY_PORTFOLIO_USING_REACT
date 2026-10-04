@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { FiExternalLink, FiCalendar, FiAward, FiEye } from 'react-icons/fi'
 import { certificates } from '../../data/certificates'
 import Reveal from '../ui/Reveal'
@@ -7,6 +6,7 @@ import SectionHeading from '../ui/SectionHeading'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import Modal from '../ui/Modal'
+import TiltCard from '../ui/TiltCard'
 
 function CertificatePreview({ cert }) {
   if (cert.image.endsWith('.pdf')) {
@@ -52,73 +52,80 @@ export default function Certificates() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {certificates.map((cert, i) => (
-            <Reveal key={cert.id} delay={(i % 3) * 0.06} amount={0.15}>
-              <motion.article
-                whileHover={{ y: -6 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                className="group h-full rounded-3xl glass overflow-hidden flex flex-col cursor-pointer hover:border-primary/40 hover:shadow-glow transition-colors duration-300"
-                onClick={() => setSelected(cert)}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    setSelected(cert)
-                  }
-                }}
-                role="button"
-                aria-label={`View ${cert.title} certificate`}
-              >
-                {/* Preview thumb */}
-                <div className="relative h-44 overflow-hidden bg-surface-2/50 shrink-0">
-                  {cert.image.endsWith('.pdf') ? (
-                    <div className="absolute inset-0 grid place-items-center p-4">
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/12 text-primary border border-primary/25 text-xs font-semibold">
-                        <FiEye className="w-4 h-4" aria-hidden="true" />
-                        PDF Certificate
+            <Reveal key={cert.id} delay={(i % 3) * 0.06} amount={0.15} className="h-full">
+              <TiltCard className="h-full" max={11} scale={1.02}>
+                <article
+                  className="group relative h-full rounded-3xl glass transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 flex flex-col cursor-pointer [transform-style:preserve-3d]"
+                  onClick={() => setSelected(cert)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setSelected(cert)
+                    }
+                  }}
+                  role="button"
+                  aria-label={`View ${cert.title} certificate`}
+                >
+                  {/* Glow border on hover */}
+                  <div
+                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
+                    style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 36px -12px var(--c-primary)' }}
+                    aria-hidden="true"
+                  />
+
+                  {/* Preview thumb — lifted forward in 3D on hover */}
+                  <div className="relative h-44 overflow-hidden rounded-t-3xl bg-surface-2/50 shrink-0 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(34px)]">
+                    {cert.image.endsWith('.pdf') ? (
+                      <div className="absolute inset-0 grid place-items-center p-4">
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/12 text-primary border border-primary/25 text-xs font-semibold">
+                          <FiEye className="w-4 h-4" aria-hidden="true" />
+                          PDF Certificate
+                        </div>
                       </div>
+                    ) : (
+                      <img
+                        src={cert.image}
+                        alt={cert.title}
+                        className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--c-base)]/80 to-transparent" aria-hidden="true" />
+                    <div className="absolute top-3 right-3 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(54px)]">
+                      <Badge tone={cert.tags.includes('Artificial Intelligence') ? 'accent' : 'primary'}>
+                        {cert.tags[0]}
+                      </Badge>
                     </div>
-                  ) : (
-                    <img
-                      src={cert.image}
-                      alt={cert.title}
-                      className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--c-base)]/80 to-transparent" aria-hidden="true" />
-                  <div className="absolute top-3 right-3">
-                    <Badge tone={cert.tags.includes('Artificial Intelligence') ? 'accent' : 'primary'}>
-                      {cert.tags[0]}
-                    </Badge>
-                  </div>
-                </div>
-
-                {/* Body */}
-                <div className="flex flex-col flex-1 p-5">
-                  <h3 className="text-base font-bold text-content leading-snug">{cert.title}</h3>
-
-                  <div className="mt-2.5 space-y-1 text-xs text-muted">
-                    <p className="flex items-center gap-1.5">
-                      <FiAward className="w-3.5 h-3.5 text-primary shrink-0" aria-hidden="true" />
-                      <span className="truncate">{cert.issuer}</span>
-                    </p>
-                    <p className="flex items-center gap-1.5">
-                      <FiCalendar className="w-3.5 h-3.5 text-primary shrink-0" aria-hidden="true" />
-                      {cert.date}
-                    </p>
                   </div>
 
-                  <p className="mt-3 text-sm text-muted leading-relaxed line-clamp-2">{cert.description}</p>
+                  {/* Body */}
+                  <div className="flex flex-col flex-1 p-5 [transform-style:preserve-3d]">
+                    <h3 className="text-base font-bold text-content leading-snug transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(26px)]">{cert.title}</h3>
 
-                  <div className="mt-auto pt-4 flex items-center justify-between gap-3">
-                    <span className="text-xs font-semibold text-primary group-hover:underline underline-offset-4">
-                      View Credential
-                    </span>
-                    <FiExternalLink className="w-4 h-4 text-muted group-hover:text-primary transition-colors" aria-hidden="true" />
+                    <div className="mt-2.5 space-y-1 text-xs text-muted transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(18px)]">
+                      <p className="flex items-center gap-1.5">
+                        <FiAward className="w-3.5 h-3.5 text-primary shrink-0" aria-hidden="true" />
+                        <span className="truncate">{cert.issuer}</span>
+                      </p>
+                      <p className="flex items-center gap-1.5">
+                        <FiCalendar className="w-3.5 h-3.5 text-primary shrink-0" aria-hidden="true" />
+                        {cert.date}
+                      </p>
+                    </div>
+
+                    <p className="mt-3 text-sm text-muted leading-relaxed line-clamp-2 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(14px)]">{cert.description}</p>
+
+                    <div className="mt-auto pt-4 flex items-center justify-between gap-3 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(28px)]">
+                      <span className="text-xs font-semibold text-primary group-hover:underline underline-offset-4">
+                        View Credential
+                      </span>
+                      <FiExternalLink className="w-4 h-4 text-muted group-hover:text-primary transition-colors" aria-hidden="true" />
+                    </div>
                   </div>
-                </div>
-              </motion.article>
+                </article>
+              </TiltCard>
             </Reveal>
           ))}
         </div>

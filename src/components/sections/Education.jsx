@@ -24,29 +24,31 @@ const timelineLine =
 
 function EducationCard({ item }) {
   return (
-    <div className="gradient-border-card rounded-3xl glass p-6 md:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow">
-      <div className="flex flex-wrap items-center gap-3 mb-3">
-        <span className="px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary/12 text-primary border border-primary/25">
+    <div className="gradient-border-card rounded-3xl glass p-5 sm:p-6 md:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
+        <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-primary/12 text-primary border border-primary/25">
           {item.period}
         </span>
-        <span className="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-accent/12 text-accent border border-accent/25">
+        <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider bg-accent/12 text-accent border border-accent/25">
           {item.type === 'education' ? 'Education' : 'Experience'}
         </span>
       </div>
 
-      <h3 className="text-xl md:text-2xl font-bold text-content">{item.title}</h3>
-      <p className="text-sm font-semibold text-primary mt-1">{item.place}</p>
+      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-content leading-snug break-words">
+        {item.title}
+      </h3>
+      <p className="text-sm font-semibold text-primary mt-1 break-words">{item.place}</p>
       <p className="text-sm text-muted mt-3 leading-relaxed">{item.summary}</p>
 
       <ul className="mt-4 space-y-2.5">
         {item.highlights.map((h) => {
           const HI = highlightIcon[h.icon] || FiAward
           return (
-            <li key={h.text} className="flex items-center gap-2.5 text-sm text-muted">
-              <span className="w-7 h-7 rounded-lg bg-accent/12 grid place-items-center text-accent shrink-0">
+            <li key={h.text} className="flex items-start gap-2.5 text-sm text-muted">
+              <span className="mt-0.5 w-7 h-7 rounded-lg bg-accent/12 grid place-items-center text-accent shrink-0">
                 <HI className="w-3.5 h-3.5" aria-hidden="true" />
               </span>
-              {h.text}
+              <span className="min-w-0 break-words">{h.text}</span>
             </li>
           )
         })}
@@ -116,15 +118,15 @@ function TimelineIcon({ item, index, reduceMotion }) {
       whileInView={reduceMotion ? undefined : { opacity: 1, scale: 1 }}
       viewport={{ once: true, amount: 0.5 }}
       transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.1 + index * 0.15 }}
-      className="relative z-10 shrink-0 flex items-center gap-x-3 md:gap-x-4"
+      className="relative z-10 shrink-0 flex items-center gap-x-2 sm:gap-x-3 md:gap-x-4"
     >
-      <span className="relative flex h-14 w-14 items-center justify-center">
+      <span className="relative flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center">
         <span className="absolute inset-0 rounded-full bg-purple-500/25 blur-lg animate-pulse" aria-hidden="true" />
-        <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-accent text-white shadow-[0_8px_30px_-6px_rgba(147,51,234,0.6)] ring-1 ring-inset ring-white/40">
-          <Icon className="w-6 h-6" aria-hidden="true" />
+        <span className="relative flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-gradient-accent text-white shadow-[0_8px_30px_-6px_rgba(147,51,234,0.6)] ring-1 ring-inset ring-white/40">
+          <Icon className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
         </span>
       </span>
-      <span className="text-xs sm:text-sm font-bold tracking-wider text-muted whitespace-nowrap">
+      <span className="hidden text-xs font-bold tracking-wider text-muted whitespace-nowrap sm:inline sm:text-sm">
         {item.year}
       </span>
     </motion.div>
@@ -138,7 +140,7 @@ function TimelineEndpoint({ reduceMotion }) {
       whileInView={reduceMotion ? undefined : { opacity: 1, scale: 1 }}
       viewport={{ once: true, amount: 0.5 }}
       transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.4 }}
-      className="relative z-10 shrink-0 flex items-center justify-center w-14 h-14"
+      className="relative z-10 shrink-0 flex items-center justify-center w-11 h-11 sm:w-14 sm:h-14"
       aria-hidden="true"
     >
       <span className="absolute inset-0 rounded-full bg-purple-500/30 blur-lg animate-pulse" />
@@ -162,13 +164,13 @@ export default function Education({ onShowResults }) {
 
         {/* Timeline — three independent layers */}
         <div className="relative max-w-5xl mx-auto">
-          {/* Layer 1: continuous vertical line */}
+          {/* Layer 1: continuous vertical line (left rail, stays inside container) */}
           <motion.div
             initial={reduceMotion ? false : { scaleY: 0 }}
             whileInView={reduceMotion ? undefined : { scaleY: 1 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute left-7 top-0 bottom-[28px] w-[2px] -translate-x-1/2 rounded-full origin-top"
+            className="education-rail-line"
             style={{ background: timelineLine }}
             aria-hidden="true"
           />
@@ -178,14 +180,14 @@ export default function Education({ onShowResults }) {
             <div
               key={item.id}
               className={`relative flex items-start ${
-                i < educationTimeline.length - 1 ? 'mb-[50px] md:mb-[60px] lg:mb-[80px]' : ''
+                i < educationTimeline.length - 1 ? 'mb-10 sm:mb-12 md:mb-14' : ''
               }`}
             >
               {/* Icon */}
               <TimelineIcon item={item} index={i} reduceMotion={reduceMotion} />
 
               {/* Gap */}
-              <div className="w-4 md:w-6 lg:w-10 shrink-0" />
+              <div className="w-3.5 sm:w-5 md:w-6 shrink-0" />
 
               {/* Card */}
               <motion.div
@@ -201,9 +203,9 @@ export default function Education({ onShowResults }) {
           ))}
 
           {/* Endpoint */}
-          <div className="relative flex items-center pt-6 md:pt-8">
+          <div className="relative flex items-center pt-5 sm:pt-6 md:pt-8">
             <TimelineEndpoint reduceMotion={reduceMotion} />
-            <div className="w-4 md:w-6 lg:w-10 shrink-0" />
+            <div className="w-3.5 sm:w-5 md:w-6 shrink-0" />
             <div className="flex-1 min-w-0" />
           </div>
         </div>
@@ -243,7 +245,7 @@ export default function Education({ onShowResults }) {
                   <p className="text-xs text-muted mt-0.5">Master of Computer Applications</p>
                 </div>
                 <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-primary/12 text-primary border border-primary/25">
-                  Sem 1 GPA 9.28
+                  Sem 2 GPA 9.68
                 </span>
               </div>
               <div className="grid sm:grid-cols-2 gap-3">

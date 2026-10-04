@@ -14,6 +14,11 @@ export const experience = {
   period: 'May 2025 – July 2026',
   type: 'Internship',
   icon: FaFlask,
+  projectName: 'MCA Admission Assistant Chatbot',
+  projectSummary:
+    'An intelligent, retrieval-based AI admission assistant built during my internship to answer MCA admission queries in real time using admin-managed MongoDB content, PDF knowledge retrieval, and Groq-powered AI responses.',
+  github: 'https://github.com/DevPatel-2208/MCA_ADMISSION_ASSISTANT_CHATBOT',
+  live: 'https://mca-admission-chatbot.netlify.app',
   highlights: [
     {
       icon: FaRobot,

@@ -54,31 +54,34 @@ function ProjectImages({ images, title }) {
 const ProjectCard = memo(function ProjectCard({ project, index, onOpenCase }) {
   return (
     <Reveal delay={index * 0.05} amount={0.15} className="h-full">
-      <TiltCard className="h-full">
+      <TiltCard className="h-full" max={13} scale={1.025}>
         <article
           data-cursor="plus"
-          className="group relative h-full rounded-3xl glass overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-glow hover:border-primary/40 hover:bg-surface-2/70 flex flex-col"
+          className="group relative h-full rounded-3xl glass transition-[box-shadow,border-color,background-color] duration-500 hover:shadow-glow hover:border-primary/40 hover:bg-surface-2/70 flex flex-col [transform-style:preserve-3d]"
         >
           {/* Glow border on hover */}
           <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+            className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
             style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 36px -12px var(--c-primary)' }}
             aria-hidden="true"
           />
 
-          {/* Banner */}
-          <div data-cursor="view" className="relative h-48 sm:h-56 overflow-hidden shrink-0">
+          {/* Banner — lifted forward in 3D on hover */}
+          <div
+            data-cursor="view"
+            className="relative h-48 sm:h-56 overflow-hidden rounded-t-3xl shrink-0 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(38px)]"
+          >
             <ProjectImages images={project.images} title={project.title} />
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--c-base)]/90 via-transparent to-transparent" aria-hidden="true" />
 
-            {/* Badges */}
-            <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+            {/* Badges — float above the banner */}
+            <div className="absolute top-3 left-3 flex flex-wrap gap-2 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(58px)]">
               {project.featured && <Badge tone="accent">★ Featured</Badge>}
               {project.status && <Badge tone="muted" className="!bg-black/40 !text-white !border-white/20 backdrop-blur-md">{project.status}</Badge>}
             </div>
 
             {project.tags.length > 0 && (
-              <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+              <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(52px)]">
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
@@ -92,16 +95,16 @@ const ProjectCard = memo(function ProjectCard({ project, index, onOpenCase }) {
           </div>
 
           {/* Body */}
-          <div className="flex flex-col flex-1 p-4 sm:p-5 md:p-6">
-            <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col flex-1 p-4 sm:p-5 md:p-6 [transform-style:preserve-3d]">
+            <div className="flex items-start justify-between gap-3 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(28px)]">
               <h3 className="text-base sm:text-lg md:text-xl font-bold text-content leading-snug">{project.title}</h3>
               <FiFolder className="w-5 h-5 text-primary shrink-0 mt-1" aria-hidden="true" />
             </div>
 
-            <p className="mt-2.5 text-sm text-muted leading-relaxed line-clamp-3">{project.summary}</p>
+            <p className="mt-2.5 text-sm text-muted leading-relaxed line-clamp-3 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(20px)]">{project.summary}</p>
 
             {/* Tech */}
-            <div className="flex flex-wrap gap-1.5 mt-4">
+            <div className="flex flex-wrap gap-1.5 mt-4 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(16px)]">
               {project.tech.slice(0, 5).map((t) => (
                 <span
                   key={t}
@@ -119,7 +122,7 @@ const ProjectCard = memo(function ProjectCard({ project, index, onOpenCase }) {
             </div>
 
             {/* Actions */}
-            <div className="mt-5 pt-4 border-t border-border grid grid-cols-2 gap-2.5">
+            <div className="mt-5 pt-4 border-t border-border grid grid-cols-2 gap-2.5 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">
               <Button
                 href={project.github}
                 external
@@ -284,10 +287,10 @@ export default function Projects() {
         />
 
         {/* Controls */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-10">
+        <div className="flex flex-col items-stretch gap-4 mb-10 md:flex-row md:items-center md:justify-center">
           {/* Filters */}
           <div
-            className="flex items-center gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center sm:overflow-visible"
+            className="flex min-w-0 items-center gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center sm:overflow-visible"
             aria-label="Project categories"
           >
             {projectFilters.map((f) => {

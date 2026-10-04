@@ -1,15 +1,44 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiDownload } from 'react-icons/fi'
+import {
+  FiDownload,
+  FiHome,
+  FiUser,
+  FiBriefcase,
+  FiBookOpen,
+  FiZap,
+  FiTool,
+  FiFolder,
+  FiAward,
+  FiMail,
+  FiX,
+  FiMenu,
+} from 'react-icons/fi'
+import { FaTrophy } from 'react-icons/fa'
 import { BsSun, BsMoon } from 'react-icons/bs'
 import useTheme from '../../hooks/useTheme'
 import useActiveSection from '../../hooks/useActiveSection'
 import useScrollLock, { useEscapeKey } from '../../hooks/useScrollLock'
 import { navLinks, site } from '../../data/site'
 import Button from '../ui/Button'
+import SocialLinks from '../ui/SocialLinks'
 
 const sectionIds = navLinks.map((link) => link.href.slice(1))
 const MOBILE_MENU_ID = 'mobile-nav-menu'
+
+/* Icons per navigation item (matches the project's existing icon set) */
+const navIcons = {
+  home: FiHome,
+  about: FiUser,
+  experience: FiBriefcase,
+  education: FiBookOpen,
+  skills: FiZap,
+  services: FiTool,
+  projects: FiFolder,
+  certificates: FiAward,
+  achievements: FaTrophy,
+  contact: FiMail,
+}
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme()
@@ -101,16 +130,17 @@ export default function Navbar() {
     }`
 
   return (
-    <header className="sticky top-0 z-50 w-full">
+    <header className="site-header">
+      {/* ═══ Desktop / tablet top bar (unchanged) ═══ */}
       <div
-        className={`relative border-b transition-all duration-300 ${headerBarClass}`}
+        className={`site-header-bar relative border-b transition-all duration-300 ${headerBarClass}`}
         style={{
           backgroundColor: scrolled ? 'var(--nav-bg)' : 'transparent',
           backdropFilter: scrolled ? 'blur(20px) saturate(160%)' : 'blur(6px)',
           WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(160%)' : 'blur(6px)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[1fr_auto_1fr] items-center gap-3 h-16 lg:h-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_auto_1fr] items-center gap-3 h-16 lg:h-20">
           {/* Logo */}
           <a
             href="#home"
@@ -128,7 +158,7 @@ export default function Navbar() {
                 decoding="async"
               />
             </span>
-            <span className="hidden xl:block font-extrabold text-base tracking-widest text-content">
+            <span className="block lg:hidden xl:block font-extrabold text-sm sm:text-base tracking-widest text-content truncate">
               {site.fullName.toUpperCase()}
             </span>
           </a>
@@ -201,13 +231,13 @@ export default function Navbar() {
               external
               size="sm"
               data-cursor="click"
-              className="hidden sm:inline-flex !px-3.5 xl:!px-4"
+              className="!hidden lg:!inline-flex min-h-10 !px-3.5 xl:!px-4"
             >
               <FiDownload className="w-4 h-4" aria-hidden="true" />
               Resume
             </Button>
 
-            {/* Hamburger */}
+            {/* Hamburger (mobile only) */}
             <button
               ref={triggerRef}
               type="button"
@@ -217,42 +247,40 @@ export default function Navbar() {
               aria-controls={MOBILE_MENU_ID}
               className="lg:hidden w-11 h-11 rounded-full glass grid place-items-center text-content hover:text-primary hover:bg-surface-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
-              <span className="relative w-5 h-5" aria-hidden="true">
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.span
-                  animate={{ y: open ? 6 : 0, rotate: open ? 45 : 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="absolute inset-x-0 top-1 h-0.5 bg-current rounded-full"
-                />
-                <motion.span
-                  animate={{ opacity: open ? 0 : 1 }}
+                  key={open ? 'x' : 'menu'}
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute inset-x-0 top-2.5 h-0.5 bg-current rounded-full"
-                />
-                <motion.span
-                  animate={{ y: open ? -6 : 0, rotate: open ? -45 : 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="absolute inset-x-0 top-4 h-0.5 bg-current rounded-full"
-                />
-              </span>
+                  className="grid place-items-center"
+                >
+                  {open ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+                </motion.span>
+              </AnimatePresence>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* ═══ MOBILE NAVIGATION DRAWER (rebuilt from scratch) ═══ */}
       <AnimatePresence>
         {open && (
           <>
+            {/* Backdrop */}
             <motion.div
               key="mobile-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm lg:hidden"
+              className="mobile-nav-backdrop lg:hidden"
               onClick={() => setOpen(false)}
               aria-hidden="true"
             />
+
+            {/* Drawer panel — full height, near full width, premium glass */}
             <motion.div
               key="mobile-panel"
               ref={panelRef}
@@ -261,51 +289,140 @@ export default function Navbar() {
               aria-modal="true"
               aria-label="Navigation menu"
               onKeyDown={handleMenuKeyDown}
-              initial={{ opacity: 0, y: -24, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -24, scale: 0.97 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-x-3 top-[4.5rem] bottom-3 z-[45] origin-top rounded-2xl glass-strong border border-border-strong shadow-2xl overflow-hidden flex flex-col lg:hidden"
+              initial={{ opacity: 0, x: '100%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: '100%' }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              className="mobile-nav-drawer lg:hidden"
             >
-              <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Mobile navigation">
-                <ul className="space-y-1">
-                  {navLinks.map((link, i) => {
-                    const id = link.href.slice(1)
-                    const isActive = active === id
-                    return (
-                      <motion.li
-                        key={link.href}
-                        initial={{ opacity: 0, x: -16 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.04 + i * 0.035 }}
-                      >
-                        <a
-                          href={link.href}
-                          onClick={(e) => handleNavClick(e, link.href)}
-                          aria-current={isActive ? 'page' : undefined}
-                          className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-                            isActive
-                              ? 'text-white bg-gradient-accent shadow-glow'
-                              : 'text-muted hover:text-content hover:bg-surface-2'
-                          }`}
-                        >
-                          {link.label}
-                          {isActive && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-white" aria-hidden="true" />
-                          )}
-                        </a>
-                      </motion.li>
-                    )
-                  })}
-                </ul>
-              </nav>
+              {/* Drawer background décor */}
+              <div className="mobile-nav-drawer-bg" aria-hidden="true" />
 
-              <div className="px-3 pt-3 pb-4 border-t border-border shrink-0">
-                <Button href={site.resume} external data-cursor="click" className="w-full" size="lg">
-                  <FiDownload className="w-4 h-4" aria-hidden="true" />
-                  Download Resume
-                </Button>
+              {/* Header row: brand + close */}
+              <div className="mobile-nav-top">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 shrink-0 rounded-xl overflow-hidden bg-surface-2 ring-1 ring-border-strong shadow-[0_8px_20px_-8px_var(--c-primary)]">
+                    <img
+                      src={site.logo}
+                      alt=""
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                      decoding="async"
+                    />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-extrabold tracking-widest text-content leading-none">
+                      {site.fullName.toUpperCase()}
+                    </p>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted mt-1">
+                      Menu
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close navigation menu"
+                  className="w-11 h-11 rounded-full glass grid place-items-center text-muted hover:text-white hover:bg-gradient-accent hover:border-transparent transition-all duration-300 active:scale-95 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <FiX className="w-5 h-5" aria-hidden="true" />
+                </button>
               </div>
+
+              {/* Scrollable body */}
+              <div className="mobile-nav-scroll">
+                {/* Profile area */}
+                <motion.div
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10, transition: { duration: 0.18 } }}
+                  transition={{ duration: 0.35, delay: 0.05 }}
+                  className="mobile-nav-profile"
+                >
+                  <div className="mobile-nav-avatar">
+                    <img
+                      src={site.profileImage.replace(/ /g, '%20')}
+                      alt={`${site.name} — ${site.role}`}
+                      width={88}
+                      height={88}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <p className="mobile-nav-name">{site.fullName}</p>
+                  <p className="mobile-nav-role">{site.role} · MCA Student</p>
+                </motion.div>
+
+                {/* Navigation list */}
+                <nav className="mobile-nav-list" aria-label="Mobile navigation">
+                  <p className="mobile-nav-section-label">
+                    <span>Navigation</span>
+                  </p>
+                  <ul className="mobile-nav-ul">
+                    {navLinks.map((link, i) => {
+                      const id = link.href.slice(1)
+                      const isActive = active === id
+                      const Icon = navIcons[id] || FiHome
+                      return (
+                        <motion.li
+                          key={link.href}
+                          initial={{ opacity: 0, x: 24 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 12, transition: { duration: 0.12 } }}
+                          transition={{ delay: 0.08 + i * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        >
+                          <a
+                            href={link.href}
+                            onClick={(e) => handleNavClick(e, link.href)}
+                            aria-current={isActive ? 'page' : undefined}
+                            className={`mobile-nav-item ${isActive ? 'is-active' : ''}`}
+                          >
+                            <span className="mobile-nav-icon">
+                              <Icon className="w-5 h-5" aria-hidden="true" />
+                            </span>
+                            <span className="mobile-nav-label">{link.label}</span>
+                            <span
+                              className={`mobile-nav-index ${isActive ? 'is-active' : ''}`}
+                              aria-hidden="true"
+                            >
+                              {String(i + 1).padStart(2, '0')}
+                            </span>
+                          </a>
+                        </motion.li>
+                      )
+                    })}
+                  </ul>
+                </nav>
+
+                {/* Resume + socials */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8, transition: { duration: 0.18 } }}
+                  transition={{ duration: 0.3, delay: 0.28 + navLinks.length * 0.04 }}
+                  className="mobile-nav-footer"
+                >
+                  <Button
+                    href={site.resume}
+                    external
+                    data-cursor="click"
+                    className="w-full !py-3.5"
+                    size="lg"
+                  >
+                    <FiDownload className="w-4 h-4" aria-hidden="true" />
+                    Download Resume
+                  </Button>
+
+                  <div className="mobile-nav-socials">
+                    <span className="mobile-nav-socials-label">Connect with me</span>
+                    <SocialLinks links={site.socials} />
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Safe-area bottom spacer */}
+              <div className="mobile-nav-safe-bottom" aria-hidden="true" />
             </motion.div>
           </>
         )}

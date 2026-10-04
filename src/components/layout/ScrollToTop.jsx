@@ -23,7 +23,8 @@ export default function ScrollToTop() {
           whileTap={{ scale: 0.94 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Scroll back to top"
-          className="fixed bottom-6 right-6 z-[60] w-11 h-11 rounded-full glass-strong grid place-items-center text-content hover:text-white hover:bg-gradient-accent hover:border-transparent shadow-lg cursor-pointer"
+          className="fixed right-4 sm:right-6 z-[60] w-11 h-11 rounded-full glass-strong grid place-items-center text-content hover:text-white hover:bg-gradient-accent hover:border-transparent shadow-lg cursor-pointer"
+          style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}
         >
           <FiArrowUp className="w-5 h-5" />
         </motion.button>

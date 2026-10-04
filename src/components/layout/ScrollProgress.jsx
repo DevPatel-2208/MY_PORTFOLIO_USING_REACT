@@ -17,7 +17,7 @@ export default function ScrollProgress() {
   return (
     <motion.div
       ref={ref}
-      className="fixed top-0 left-0 right-0 h-0.5 origin-left z-[100] bg-gradient-accent"
+      className="fixed top-0 left-0 right-0 h-0.5 origin-left z-[1005] bg-gradient-accent"
       style={{ transform: 'scaleX(0)' }}
       role="progressbar"
       aria-label="Page scroll progress"

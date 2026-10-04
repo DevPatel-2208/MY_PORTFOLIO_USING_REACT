@@ -98,7 +98,7 @@ export default function Contact() {
     }`
 
   return (
-    <section id="contact" className="relative py-20 md:py-28">
+    <section id="contact" className="relative py-20 md:py-28 overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Contact"

@@ -1,9 +1,10 @@
-import { FiCalendar, FiCheckCircle } from 'react-icons/fi'
-import { FaUniversity } from 'react-icons/fa'
+import { FiCalendar, FiExternalLink, FiGithub } from 'react-icons/fi'
+import { FaUniversity, FaRobot } from 'react-icons/fa'
 import { experience } from '../../data/experience'
 import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
 import Badge from '../ui/Badge'
+import Button from '../ui/Button'
 
 export default function Experience() {
   return (
@@ -41,6 +42,66 @@ export default function Experience() {
                 </div>
               </div>
 
+              {/* Project summary */}
+              <div className="relative rounded-2xl overflow-hidden p-5 sm:p-7 mb-8 border border-border dark:border-white/10 bg-gradient-to-br from-white via-slate-50 to-indigo-50/60 dark:from-[#0c1326] dark:via-[#0a1022] dark:to-[#070c18] shadow-soft dark:shadow-[0_24px_50px_-24px_rgba(2,6,23,0.6)]">
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-60 dark:opacity-100"
+                  aria-hidden="true"
+                  style={{
+                    background:
+                      'radial-gradient(420px 180px at 18% 0%, rgba(99,102,241,0.14), transparent 60%), radial-gradient(360px 160px at 92% 10%, rgba(168,85,247,0.12), transparent 58%)',
+                  }}
+                />
+
+                <div className="relative flex items-start gap-3 mb-4">
+                  <span className="w-11 h-11 shrink-0 rounded-xl bg-gradient-accent text-white grid place-items-center shadow-glow">
+                    <FaRobot className="w-5 h-5" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <h4 className="text-base sm:text-lg font-bold text-content leading-snug">{experience.projectName}</h4>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" aria-hidden="true" />
+                      Flagship Internship Project
+                    </span>
+                  </div>
+                </div>
+
+                <p className="relative text-sm text-muted leading-relaxed mb-5">{experience.projectSummary}</p>
+
+                {/* Tags */}
+                <div className="relative flex flex-wrap gap-2 mb-6">
+                  {experience.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 dark:bg-white/10 dark:text-white dark:border-white/20 backdrop-blur-sm"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Links */}
+                <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5 border-t border-border dark:border-white/10">
+                  <Button
+                    href={experience.github}
+                    external
+                    variant="outlinePrimary"
+                    className="w-full justify-center"
+                  >
+                    <FiGithub className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    <span className="truncate">View Code</span>
+                  </Button>
+                  <Button
+                    href={experience.live}
+                    external
+                    className="w-full justify-center"
+                  >
+                    <FiExternalLink className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    <span className="truncate">Live Demo</span>
+                  </Button>
+                </div>
+              </div>
+
               {/* Highlights */}
               <ul className="grid md:grid-cols-2 gap-4 md:gap-5">
                 {experience.highlights.map((h) => (
@@ -60,19 +121,6 @@ export default function Experience() {
                   </li>
                 ))}
               </ul>
-
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2.5 mt-8 pt-7 border-t border-border">
-                {experience.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-accent/10 text-accent border border-accent/25"
-                  >
-                    <FiCheckCircle className="w-3.5 h-3.5" aria-hidden="true" />
-                    {tag}
-                  </span>
-                ))}
-              </div>
             </div>
           </Reveal>
         </div>

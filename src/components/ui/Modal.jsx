@@ -45,7 +45,7 @@ export default function Modal({ open, onClose, title, children, maxWidth = 'max-
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-6"
+          className="fixed inset-0 z-[1200] flex items-end sm:items-center justify-center p-0 sm:p-6"
           style={{ background: 'rgba(2, 6, 23, 0.72)', backdropFilter: 'blur(6px)' }}
           onClick={onClose}
           role="dialog"
@@ -61,22 +61,30 @@ export default function Modal({ open, onClose, title, children, maxWidth = 'max-
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 320, damping: 30 }}
             onClick={(e) => e.stopPropagation()}
-            className={`relative w-full ${maxWidth} max-h-[88vh] sm:max-h-[85vh] rounded-t-3xl sm:rounded-3xl overflow-hidden outline-none glass-strong shadow-2xl`}
+            className={`relative flex flex-col w-full ${maxWidth} max-h-[92dvh] sm:max-h-[85dvh] rounded-t-3xl sm:rounded-3xl overflow-hidden outline-none glass-strong shadow-2xl`}
           >
+            {/* Mobile drag handle */}
+            <div className="sm:hidden flex justify-center pt-2.5 shrink-0" aria-hidden="true">
+              <span className="h-1 w-10 rounded-full bg-border-strong" />
+            </div>
+
             {title && (
-              <div className="flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-border bg-surface/50">
-                <h3 className="text-base sm:text-lg font-bold text-content">{title}</h3>
+              <div className="flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-border bg-surface/50 shrink-0">
+                <h3 className="text-base sm:text-lg font-bold text-content break-words min-w-0">{title}</h3>
                 <button
                   type="button"
                   onClick={onClose}
                   aria-label="Close dialog"
-                  className="p-2 rounded-full text-muted hover:text-content hover:bg-surface-2 transition-colors cursor-pointer"
+                  className="shrink-0 p-2 rounded-full text-muted hover:text-content hover:bg-surface-2 transition-colors cursor-pointer"
                 >
                   <FiX className="w-5 h-5" />
                 </button>
               </div>
             )}
-            <div className="overflow-y-auto max-h-[calc(88vh-4.5rem)] sm:max-h-[calc(85vh-4.5rem)]">
+            <div
+              className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
+              style={{ paddingBottom: 'max(0px, env(safe-area-inset-bottom))' }}
+            >
               {children}
             </div>
           </motion.div>

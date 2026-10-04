@@ -6,6 +6,7 @@ import { typedRoles, heroStats, site } from '../../data/site'
 import SocialLinks from '../ui/SocialLinks'
 import AnimatedNumber from '../ui/AnimatedNumber'
 import Button from '../ui/Button'
+import TiltCard from '../ui/TiltCard'
 
 function useTypewriter(words) {
   const [text, setText] = useState('')
@@ -57,28 +58,28 @@ const floatingTech = [
   {
     icon: SiReact,
     label: 'React',
-    pos: 'top-1/2 -translate-y-1/2 -left-3 sm:-top-5 sm:translate-y-0 sm:-left-8',
+    pos: 'hero-tag-wrap hero-tag-wrap--top',
     delay: 0.2,
     color: '#61dafb',
   },
   {
     icon: SiNodedotjs,
     label: 'Node.js',
-    pos: 'top-1/2 -translate-y-1/2 -right-3 sm:-right-10',
+    pos: 'hero-tag-wrap hero-tag-wrap--right',
     delay: 0.4,
     color: '#68a063',
   },
   {
     icon: SiMongodb,
     label: 'MongoDB',
-    pos: '-bottom-3 -left-2 sm:bottom-8 sm:-left-12',
+    pos: 'hero-tag-wrap hero-tag-wrap--bottom',
     delay: 0.6,
     color: '#4faa41',
   },
   {
     icon: SiExpress,
     label: 'Express',
-    pos: '-bottom-3 -right-2 sm:-bottom-5 sm:right-6',
+    pos: 'hero-tag-wrap hero-tag-wrap--left',
     delay: 0.8,
     color: 'var(--c-content)',
   },
@@ -136,62 +137,48 @@ export default function Hero() {
             transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="order-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:self-center relative flex items-center justify-center mt-6 lg:mt-0"
           >
-            <div className="relative w-[70vw] h-[70vw] max-w-[18rem] min-w-[15rem] sm:w-80 sm:h-80 lg:w-96 lg:h-96 lg:max-w-full">
-              {/* Rotating dashed ring */}
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  border: '1.5px dashed var(--c-primary)',
-                  animation: 'spinSlow 26s linear infinite',
-                }}
-                aria-hidden="true"
-              />
-              {/* Glow */}
-              <div
-                className="absolute inset-4 rounded-full animate-blob"
-                style={{ background: 'var(--glow-b)', filter: 'blur(50px)' }}
-                aria-hidden="true"
-              />
-
-              {/* Portrait */}
-              <div className="absolute inset-6 rounded-full overflow-hidden glass-strong p-1.5">
-                <img
-                  src="/image%20dev.jpeg"
-                  alt={`${site.name} — ${site.role}`}
-                  className="w-full h-full object-cover rounded-full"
-                  width={384}
-                  height={384}
-                  fetchPriority="high"
+            <TiltCard className="hero-tilt" max={11} scale={1.035} glareRadius="9999px">
+              <div className="hero-orbit">
+                {/* Rotating dashed ring (outer orbit) */}
+                <div
+                  className="hero-orbit-ring"
+                  style={{ animation: 'spinSlow 32s linear infinite' }}
+                  aria-hidden="true"
                 />
+                {/* Glow */}
+                <div className="hero-orbit-glow" style={{ background: 'var(--glow-b)' }} aria-hidden="true" />
+
+                {/* Portrait */}
+                <div className="hero-orbit-photo glass-strong">
+                  <img
+                    src="/image%20dev.jpeg"
+                    alt={`${site.name} — ${site.role}`}
+                    className="w-full h-full object-cover rounded-full"
+                    width={384}
+                    height={384}
+                    fetchPriority="high"
+                  />
+                </div>
+
+                {/* Floating tech tags — hang on the orbit ring, never over the photo */}
+                {floatingTech.map((t, i) => (
+                  <motion.div
+                    key={t.label}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.9 + i * 0.15, type: 'spring', stiffness: 260, damping: 18 }}
+                    className={t.pos}
+                  >
+                    <div className="hero-tag-pin">
+                      <div className="hero-tag hero-tag-float" style={{ animationDelay: `${i * 1.2}s` }}>
+                        <t.icon className="hero-tag-icon" style={{ color: t.color }} aria-hidden="true" />
+                        <span className="hero-tag-label">{t.label}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-
-              {/* Floating tech badges */}
-              {floatingTech.map((t, i) => (
-                <motion.div
-                  key={t.label}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.9 + i * 0.15, type: 'spring', stiffness: 260, damping: 18 }}
-                  className={`absolute ${t.pos} animate-float`}
-                  style={{ animationDelay: `${i * 1.2}s` }}
-                >
-                  <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl glass-strong shadow-md">
-                    <t.icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: t.color }} aria-hidden="true" />
-                    <span className="text-[11px] sm:text-xs font-bold text-content whitespace-nowrap">{t.label}</span>
-                  </div>
-                </motion.div>
-              ))}
-
-              {/* Corner badge */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.4, type: 'spring' }}
-                className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full glass-strong shadow-md hidden sm:block"
-              >
-                <span className="text-xs font-bold text-gradient">3+ yrs learning</span>
-              </motion.div>
-            </div>
+            </TiltCard>
           </motion.div>
 
           {/* Intro */}

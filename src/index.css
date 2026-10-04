@@ -6,7 +6,10 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --color-base: var(--c-base);
+  /* NOTE: `base` is intentionally NOT mapped to a Tailwind color token —
+     doing so makes `text-base` resolve to `color: var(--c-base)` instead of
+     the font-size utility, which silently makes text match the page
+     background (invisible). Use `var(--c-base)` directly for backgrounds. */
   --color-base-2: var(--c-base-2);
   --color-surface: var(--c-surface);
   --color-surface-2: var(--c-surface-2);
@@ -51,6 +54,10 @@
   --heading-end: #4f46e5;
   --nav-bg: rgba(255, 255, 255, 0.72);
   --overlay: rgba(255, 255, 255, 0.86);
+
+  /* Fixed header bar height (inner bar h-16 / lg:h-20) — single source
+     of truth for main flow offset + anchor scroll clearance. */
+  --header-h: 4rem;
   --glow-a: rgba(79, 70, 229, 0.14);
   --glow-b: rgba(168, 85, 247, 0.12);
   --glow-c: rgba(16, 185, 129, 0.1);
@@ -82,6 +89,12 @@
   color-scheme: dark;
 }
 
+@media (min-width: 1024px) {
+  :root {
+    --header-h: 5rem;
+  }
+}
+
 @layer base {
   * {
     border-color: var(--c-border);
@@ -98,6 +111,11 @@
     background-color: var(--c-base);
     color: var(--c-content);
     line-height: 1.7;
+    /* Architectural guard (not a symptom patch): contains the hero orbit
+       tags that intentionally bleed past the mobile viewport edge, plus
+       the transient +48px pre-reveal transform of right-direction Reveal
+       animations. No horizontal scrolling can ever occur; `clip` (not
+       `hidden`) keeps position:fixed/sticky semantics untouched. */
     overflow-x: hidden;
     overflow-x: clip;
     -webkit-font-smoothing: antialiased;
@@ -120,8 +138,32 @@
     color: #ffffff;
   }
 
+  /* Anchor targets clear the fixed header (bar + notch inset + 20px
+     breathing room) so section headings are never covered. */
   section[id] {
-    scroll-margin-top: 84px;
+    scroll-margin-top: calc(var(--header-h) + env(safe-area-inset-top, 0px) + 1.25rem);
+  }
+
+  img,
+  video,
+  canvas {
+    max-width: 100%;
+  }
+
+  input,
+  textarea,
+  select {
+    max-width: 100%;
+  }
+
+  /* Prevent iOS Safari auto-zoom on form focus (sub-16px inputs trigger
+     viewport zoom). Desktop sizing is untouched. */
+  @media (max-width: 767px) {
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -286,6 +328,93 @@
   pointer-events: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   3D tilt cards (Featured Projects)
+   A perspective wrapper turns the child's rotateX/rotateY into real
+   depth; inner layers are pushed on the Z axis for a parallax feel,
+   and a pointer-following glare sweeps the surface.
+   ═══════════════════════════════════════════════════════════════════ */
+.tilt-perspective {
+  perspective: 1100px;
+  perspective-origin: 50% 50%;
+}
+
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(
+    240px circle at var(--gx, 50%) var(--gy, 50%),
+    color-mix(in srgb, var(--c-primary) 22%, transparent),
+    transparent 62%
+  );
+  mix-blend-mode: screen;
+}
+
+.dark .tilt-glare {
+  background: radial-gradient(
+    260px circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(255, 255, 255, 0.14),
+    transparent 60%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt-perspective {
+    perspective: none;
+  }
+
+  .tilt-glare {
+    display: none;
+  }
+}
+
+/* Touch devices: no hover tilt, keep it flat and crisp */
+@media (hover: none) {
+  .tilt-perspective {
+    perspective: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Social brand tiles — GitHub / LinkedIn / Email / Location
+   Solid brand gradients with a white glyph so the icon is always
+   legible in light AND dark mode. Lift + brand glow on hover.
+   ═══════════════════════════════════════════════════════════════════ */
+.social-brand {
+  position: relative;
+  background-size: 100% 100%;
+  box-shadow:
+    0 6px 16px -8px var(--brand-glow, rgba(2, 6, 23, 0.4)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    filter 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.social-brand:hover {
+  transform: translateY(-4px);
+  filter: saturate(1.08) brightness(1.05);
+  box-shadow:
+    0 14px 28px -10px var(--brand-glow, rgba(2, 6, 23, 0.5)),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.social-brand:active {
+  transform: translateY(-1px) scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-brand {
+    transition: none;
+  }
+}
+
 /* Hide scrollbars for horizontal scroll rows (mobile filters, etc.) */
 .scrollbar-none {
   -ms-overflow-style: none;
@@ -311,4 +440,1692 @@
   width: 18px;
   background: #ffffff;
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Preloader — loading screen, card locked to the exact viewport center
+   Full-viewport grid container + margin:auto card + dynamic viewport
+   units + safe-area padding. Center holds during load animation,
+   progress updates, theme switching and rotation.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.pl-root {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding-top: max(1.25rem, env(safe-area-inset-top));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  background:
+    radial-gradient(900px 500px at 12% -6%, color-mix(in srgb, var(--c-primary) 10%, transparent), transparent 60%),
+    radial-gradient(800px 480px at 105% 4%, color-mix(in srgb, var(--c-secondary) 9%, transparent), transparent 55%),
+    var(--c-base);
+}
+
+/* ── Background layers (decor only, never affect layout) ─────────── */
+.pl-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pl-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(72px);
+  will-change: transform;
+  animation: pl-blob 22s ease-in-out infinite;
+}
+
+.pl-blob--a {
+  width: 46vmax;
+  height: 46vmax;
+  left: -14vmax;
+  top: -16vmax;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.28), transparent 62%);
+}
+
+.dark .pl-blob--a {
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.26), transparent 62%);
+}
+
+.pl-blob--b {
+  width: 40vmax;
+  height: 40vmax;
+  right: -12vmax;
+  bottom: -14vmax;
+  background: radial-gradient(circle, rgba(147, 51, 234, 0.22), transparent 62%);
+  animation-delay: -11s;
+}
+
+.dark .pl-blob--b {
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.2), transparent 62%);
+}
+
+@keyframes pl-blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(3vmax, 2vmax) scale(1.1); }
+}
+
+.pl-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--c-border-strong) 45%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--c-border-strong) 45%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  opacity: 0.4;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 15%, transparent 78%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 15%, transparent 78%);
+}
+
+.dark .pl-grid {
+  opacity: 0.16;
+}
+
+.pl-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 100% at 50% 45%, transparent 60%, color-mix(in srgb, var(--c-base) 45%, transparent) 100%);
+}
+
+/* ── Card: margin:auto centers it AND keeps the top reachable when the
+   card is taller than short/landscape viewports ──────────────────── */
+.pl-card {
+  position: relative;
+  margin: auto;
+  width: clamp(min(280px, 86%), 90%, 340px);
+  padding: 1.5rem 1.4rem;
+  border-radius: 1.5rem;
+  text-align: center;
+  background: color-mix(in srgb, var(--c-base-2) 66%, transparent);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid color-mix(in srgb, var(--c-border-strong) 55%, transparent);
+  box-shadow:
+    0 32px 70px -30px color-mix(in srgb, var(--c-content) 40%, transparent),
+    0 0 56px -24px color-mix(in srgb, var(--c-primary) 26%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.dark .pl-card {
+  background: color-mix(in srgb, var(--c-base-2) 58%, transparent);
+  box-shadow:
+    0 36px 80px -32px rgba(0, 0, 0, 0.8),
+    0 0 64px -26px color-mix(in srgb, var(--c-primary) 36%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Tablet: 380–420px · Desktop: 420–460px (capped so edges stay clear) */
+@media (min-width: 640px) {
+  .pl-card {
+    width: clamp(min(380px, 86%), 88%, 420px);
+    padding: 1.9rem 1.9rem;
+    border-radius: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pl-card {
+    width: min(clamp(420px, 30vw, 460px), 100%);
+    padding: 2.1rem 2.1rem;
+    border-radius: 2rem;
+  }
+}
+
+/* ── Card internals: fixed geometry so progress/theme updates never
+   shift the layout ───────────────────────────────────────────────── */
+.pl-avatar-ring {
+  width: 6rem;
+  height: 6rem;
+  margin: 0 auto;
+  border-radius: 9999px;
+  padding: 3px;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  box-shadow: 0 0 30px -8px color-mix(in srgb, var(--c-primary) 60%, transparent);
+}
+
+.pl-avatar,
+.pl-avatar-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover;
+  background: var(--c-base-2);
+}
+
+.pl-avatar-fallback {
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--c-primary);
+}
+
+.pl-name {
+  margin-top: 0.9rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--c-content);
+}
+
+.pl-role {
+  margin-top: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+/* Fixed-height slot: message swaps never move the card */
+.pl-status {
+  display: flex;
+  justify-content: center;
+  min-height: 1.75rem;
+  margin-top: 0.9rem;
+}
+
+.pl-message {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--c-muted);
+}
+
+.pl-status-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  flex: none;
+  border-radius: 9999px;
+  background: var(--c-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--c-accent) 70%, transparent);
+  animation: pl-dot-blink 1.4s ease-in-out infinite;
+}
+
+@keyframes pl-dot-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.pl-progress {
+  margin-top: 0.9rem;
+}
+
+.pl-track {
+  height: 0.5rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--c-muted) 18%, transparent);
+  border: 1px solid var(--c-border);
+}
+
+.pl-fill {
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--c-primary), var(--c-secondary));
+  transition: width 0.15s linear;
+}
+
+.pl-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -30%;
+  width: 30%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-18deg);
+  animation: pl-shine-slide 1.8s ease-in-out infinite;
+}
+
+@keyframes pl-shine-slide {
+  0% { transform: translateX(0) skewX(-18deg); }
+  100% { transform: translateX(480%) skewX(-18deg); }
+}
+
+.pl-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.pl-label {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+.pl-pct {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-content);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--c-primary) 28%, transparent);
+}
+
+/* Short landscape phones: compact card, still margin:auto centered */
+@media (max-height: 560px) and (orientation: landscape) {
+  .pl-avatar-ring {
+    width: 3.4rem;
+    height: 3.4rem;
+  }
+
+  .pl-name {
+    margin-top: 0.5rem;
+    font-size: 1.05rem;
+  }
+
+  .pl-status,
+  .pl-progress {
+    margin-top: 0.55rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-blob,
+  .pl-shine,
+  .pl-status-dot {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   About layout — reading-order grid
+   Mobile/tablet: image → content → terminal (single column, the
+   .about-left wrapper vanishes via display:contents so order applies)
+   Desktop: left flex stack (image + terminal, exact 24px gap) beside
+   the text content — immune to spanning-track stretch
+   ═══════════════════════════════════════════════════════════════════ */
+
+.about-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.about-left {
+  display: contents;
+}
+
+.about-media {
+  order: 1;
+  min-width: 0;
+}
+
+.about-content {
+  order: 2;
+  min-width: 0;
+}
+
+.about-terminal {
+  order: 3;
+  min-width: 0;
+}
+
+/* Tablet: single column, centered, terminal capped at 420–450px */
+@media (min-width: 768px) and (max-width: 1023.5px) {
+  .about-layout {
+    gap: 2rem;
+    justify-items: center;
+  }
+
+  .about-media,
+  .about-content {
+    width: 100%;
+    max-width: 36rem;
+  }
+
+  .about-terminal {
+    width: 100%;
+    max-width: 440px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-layout {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    column-gap: 3.5rem;
+  }
+
+  /* Left stack behaves as one component: image + terminal share
+     the exact column width with only 24px between them. */
+  .about-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+
+  .about-left > * {
+    min-width: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   About terminal card — mobile-first, dark glass in both themes
+   Mobile: 100% width · 13–14px mono · 1.6 line-height · no clipping
+   ═══════════════════════════════════════════════════════════════════ */
+
+.about-terminal-card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 1rem;
+  background:
+    radial-gradient(420px 180px at 18% 0%, rgba(99, 102, 241, 0.14), transparent 58%),
+    radial-gradient(360px 160px at 92% 8%, rgba(168, 85, 247, 0.12), transparent 56%),
+    linear-gradient(180deg, #0c1326 0%, #0a1022 42%, #070c18 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 24px 50px -24px rgba(2, 6, 23, 0.55),
+    0 0 44px -18px rgba(99, 102, 241, 0.42),
+    0 0 64px -28px rgba(168, 85, 247, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.at-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.at-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  flex: none;
+  border-radius: 9999px;
+}
+
+.at-dot--red { background: rgba(248, 113, 113, 0.9); }
+.at-dot--amber { background: rgba(251, 191, 36, 0.9); }
+.at-dot--green { background: rgba(52, 211, 153, 0.9); }
+
+.at-title {
+  margin-left: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 3.4vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.at-live {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  flex: none;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.32);
+  white-space: nowrap;
+}
+
+.at-live-dot {
+  width: 0.34rem;
+  height: 0.34rem;
+  flex: none;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: at-blink 1.4s ease-in-out infinite;
+}
+
+/* Body — stable internal content region. All rows are present in the DOM
+   from first paint so the card never changes height or pushes layout. */
+.at-body {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: 1.05rem 1rem;
+  font-family: var(--font-mono);
+  font-size: clamp(12px, 3.2vw, 13.5px);
+  line-height: 1.65;
+}
+
+.at-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.3rem 0;
+  color: #c3cee6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.at-command {
+  color: #f1f5f9;
+  font-weight: 700;
+}
+
+.at-command-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #ffffff;
+  font-weight: 700;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.at-prompt {
+  flex: none;
+  color: #34d399;
+  font-weight: 800;
+}
+
+.at-check {
+  flex: none;
+  color: #34d399;
+  font-weight: 800;
+  line-height: 1.65;
+}
+
+.at-output-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ── Reserved rows: output + final prompt occupy layout from the start.
+      They fade/slide in at their final position — no downward shift, no
+      height change, no reflow. ───────────────────────────────────── */
+.at-output,
+.at-final {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.at-output.is-visible,
+.at-final.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Typing cursor — inline with the command text while it types */
+.at-typing-cursor {
+  display: inline-block;
+  width: 0.58em;
+  height: 1.05em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  background: #34d399;
+  animation: at-blink 1.05s steps(2, start) infinite;
+}
+
+.at-typing-cursor--idle {
+  animation: none;
+  opacity: 1;
+}
+
+/* Final prompt cursor — the ONLY blinking cursor once the sequence completes */
+.at-cursor {
+  display: inline-block;
+  width: 0.58em;
+  height: 1.08em;
+  align-self: center;
+  flex: none;
+  border-radius: 2px;
+  background: #34d399;
+  animation: at-blink 1.05s steps(2, start) infinite;
+}
+
+@keyframes at-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (min-width: 640px) {
+  .at-title {
+    font-size: 14px;
+  }
+
+  .at-body {
+    padding: 1.2rem 1.35rem;
+    font-size: 13.5px;
+  }
+}
+
+@media (min-width: 768px) {
+  .at-body {
+    padding: 1.25rem 1.5rem;
+    font-size: 14px;
+  }
+}
+
+/* Very small screens — prevent header overflow, keep LIVE visible */
+@media (max-width: 360px) {
+  .at-head {
+    gap: 0.38rem;
+    padding: 0.7rem 0.75rem;
+  }
+
+  .at-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+  }
+
+  .at-title {
+    font-size: 11px;
+  }
+
+  .at-live {
+    padding: 0.14rem 0.4rem;
+    font-size: 0.52rem;
+    letter-spacing: 0.14em;
+  }
+
+  .at-body {
+    padding: 0.95rem 0.85rem;
+  }
+
+  .at-line {
+    gap: 0.45rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .at-output,
+  .at-final {
+    transition: none;
+  }
+
+  .at-output,
+  .at-final,
+  .at-typing-cursor,
+  .at-cursor,
+  .at-live-dot {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* In reduced-motion the JS jumps straight to complete, but if CSS
+     still hid rows via opacity 0 they'd stay hidden — force visible. */
+  .at-output,
+  .at-final {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   About intro video — natural 16:9 landscape, full frame visible
+   The source video is 1920×1080, so the card follows that ratio:
+   width 100%, height scales proportionally — no crop, no stretch,
+   no black bars on any screen. Subtle zoom on hover (desktop).
+   ═══════════════════════════════════════════════════════════════════ */
+
+.about-video-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: #0a0f1e;
+  line-height: 0;
+}
+
+.about-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9; /* reserves space before metadata loads — no layout shift */
+  object-fit: contain;
+  object-position: center;
+  background: #0a0f1e;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group:hover .about-video {
+  transform: scale(1.03);
+}
+
+/* Sound toggle — floats over the video, mobile-friendly tap target */
+.about-video-sound {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 999px;
+  line-height: 1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  cursor: pointer;
+  background: rgba(2, 6, 23, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 24px -10px rgba(2, 6, 23, 0.7);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.about-video-sound:hover {
+  background: rgba(2, 6, 23, 0.78);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.about-video-sound:active {
+  transform: scale(0.95);
+}
+
+.about-video-sound:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
+}
+
+@media (min-width: 640px) {
+  .about-video-sound {
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.55rem 0.9rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Fixed top header — viewport-anchored so it can never scroll away
+   (immune to scroll-container / overflow-x: clip quirks on mobile).
+   Safe-area top keeps the bar clear of notches / Dynamic Island.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Horizontal safe-area (landscape notch): bar background covers its
+   padding box, so the glass strip stays full-bleed while the content
+   inside is kept clear of the notch. Portrait insets are 0 → no change. */
+.site-header-bar {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* The header is out of flow — restore its exact flow space (bar height
+   + 1px border + notch inset) so no page content hides underneath. */
+main {
+  padding-top: calc(var(--header-h) + 1px + env(safe-area-inset-top, 0px));
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Hero profile orbit — photo is the primary protected element.
+   Tags float around the OUTER edge of the orbit container (container-
+   relative %, never on top of the photo). Photo scales with clamp().
+   ═══════════════════════════════════════════════════════════════════ */
+
+.hero-orbit {
+  position: relative;
+  width: min(94vw, 27rem);
+  height: min(94vw, 27rem);
+  max-width: 100%;
+  transform-style: preserve-3d;
+}
+
+/* ── 3D portrait tilt (same treatment as Featured Projects) ──
+   The whole orbit sits inside a perspective wrapper, so on hover the
+   portrait pops forward on the Z axis while the ring/glow stay on the
+   base plane — real depth, not a flat scale. Tags lift too, and a
+   circular glare sweeps the face. */
+.hero-tilt {
+  width: fit-content;
+  --photo-inset: 40px;
+}
+
+.hero-tilt .tilt-glare {
+  inset: var(--photo-inset, 40px);
+}
+
+/* Rotating dashed ring — the outer orbit boundary */
+.hero-orbit-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1.5px dashed var(--c-primary);
+  opacity: 0.85;
+}
+
+/* Soft glow behind the photo */
+.hero-orbit-glow {
+  position: absolute;
+  inset: 12%;
+  border-radius: 9999px;
+  filter: blur(50px);
+  opacity: 0.7;
+  animation: blob 16s ease-in-out infinite;
+}
+
+/* Photo — primary, protected, always centered.
+   A fixed ~46px safe ring separates the photo from tags on the orbit
+   edge. This ring is larger than any tag's half-width (+ float), so the
+   face is never covered, while the photo stays as large as possible. */
+.hero-orbit-photo {
+  position: absolute;
+  inset: var(--photo-inset, 40px);
+  border-radius: 9999px;
+  overflow: hidden;
+  padding: 0.375rem;
+  border: 1px solid var(--c-border-strong);
+  box-shadow: 0 0 40px -10px color-mix(in srgb, var(--c-primary) 55%, transparent);
+  transform: translateZ(0);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s ease,
+    border-color 0.6s ease;
+  will-change: transform;
+}
+
+/* Portrait pops forward toward the viewer while the ring/glow stay on
+   the base plane — the depth cue is what sells the 3D. */
+.hero-tilt:hover .hero-orbit-photo {
+  transform: translateZ(48px);
+  border-color: color-mix(in srgb, var(--c-primary) 60%, var(--c-border-strong));
+  box-shadow: 0 0 70px -8px color-mix(in srgb, var(--c-primary) 75%, transparent),
+    0 30px 60px -24px rgba(0, 0, 0, 0.55);
+}
+
+.hero-orbit-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+/* ── Technology tags — sit on the outer orbit ring, never on the photo ──
+   Each wrapper centres a tag on the orbit edge. The photo is inset 15%,
+   so the ring between orbit edge and photo is ~15% wide — wide enough for
+   the compact tags below to stay clear of the face. The float animation
+   lives on the inner pill so the wrapper's centring transform is never
+   overridden. */
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.38rem 0.65rem;
+  border-radius: 999px;
+  background: var(--c-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--c-border-strong);
+  box-shadow: 0 8px 24px -10px color-mix(in srgb, var(--c-primary) 45%, transparent);
+  white-space: nowrap;
+}
+
+.hero-tag-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.hero-tag-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--c-content);
+  line-height: 1;
+}
+
+/* Gentle ±10px float — subtle enough to never carry a tag into the photo */
+.hero-tag-float {
+  animation: hero-float 5s ease-in-out infinite;
+}
+
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Wrappers anchor to the orbit edges (position only — framer animates
+   opacity/scale on these, never transform). The inner `.hero-tag-pin`
+   does the centring so framer's inline transform can't override it. */
+.hero-tag-wrap--top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+}
+
+.hero-tag-wrap--right {
+  position: absolute;
+  top: 50%;
+  right: 0;
+}
+
+.hero-tag-wrap--bottom {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+}
+
+.hero-tag-wrap--left {
+  position: absolute;
+  top: 50%;
+  left: 0;
+}
+
+.hero-tag-pin {
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Tags share the card's 3D space so they float above the orbit plane */
+.hero-tag-wrap {
+  transform-style: preserve-3d;
+}
+
+.hero-tilt:hover .hero-tag-wrap--top .hero-tag-pin {
+  transform: translate(-50%, -50%) translateZ(36px);
+}
+
+.hero-tilt:hover .hero-tag-wrap--right .hero-tag-pin {
+  transform: translate(50%, -50%) translateZ(36px);
+}
+
+.hero-tilt:hover .hero-tag-wrap--bottom .hero-tag-pin {
+  transform: translate(-50%, 50%) translateZ(36px);
+}
+
+.hero-tilt:hover .hero-tag-wrap--left .hero-tag-pin {
+  transform: translate(-50%, -50%) translateZ(36px);
+}
+
+.hero-tag-wrap--top .hero-tag-pin {
+  transform: translate(-50%, -50%);
+}
+
+.hero-tag-wrap--right .hero-tag-pin {
+  transform: translate(50%, -50%);
+}
+
+.hero-tag-wrap--bottom .hero-tag-pin {
+  transform: translate(-50%, 50%);
+}
+
+.hero-tag-wrap--left .hero-tag-pin {
+  transform: translate(-50%, -50%);
+}
+
+/* Corner badge below the photo */
+.hero-orbit-badge {
+  position: absolute;
+  bottom: 1.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--c-border-strong);
+  box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--c-primary) 45%, transparent);
+}
+
+/* Very small phones: shrink tags further so they never crowd the photo */
+@media (max-width: 360px) {
+  .hero-orbit {
+    width: min(94vw, 24rem);
+    height: min(94vw, 24rem);
+  }
+  .hero-tilt {
+    --photo-inset: 34px;
+  }
+  .hero-tag {
+    padding: 0.3rem 0.5rem;
+    gap: 0.3rem;
+  }
+  .hero-tag-icon {
+    width: 0.72rem;
+    height: 0.72rem;
+  }
+  .hero-tag-label {
+    font-size: 0.6rem;
+  }
+}
+
+/* Desktop: larger photo, tags slightly bigger */
+@media (min-width: 1024px) {
+  .hero-orbit {
+    width: clamp(23rem, 31vw, 30rem);
+    height: clamp(23rem, 31vw, 30rem);
+  }
+  .hero-tag-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  .hero-tag-label {
+    font-size: 0.74rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-orbit-glow,
+  .hero-orbit-ring,
+  .hero-tag-float {
+    animation: none;
+  }
+
+  /* No hover depth jumps when motion is reduced — keep tags centred */
+  .hero-tilt:hover .hero-orbit-photo {
+    transform: translateZ(0);
+  }
+  .hero-tilt:hover .hero-tag-wrap--top .hero-tag-pin {
+    transform: translate(-50%, -50%);
+  }
+  .hero-tilt:hover .hero-tag-wrap--right .hero-tag-pin {
+    transform: translate(50%, -50%);
+  }
+  .hero-tilt:hover .hero-tag-wrap--bottom .hero-tag-pin {
+    transform: translate(-50%, 50%);
+  }
+  .hero-tilt:hover .hero-tag-wrap--left .hero-tag-pin {
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Touch: tap can leave :hover sticky, so keep the portrait flat */
+@media (hover: none) {
+  .hero-tilt:hover .hero-orbit-photo {
+    transform: translateZ(0);
+  }
+  .hero-tilt:hover .hero-tag-wrap--top .hero-tag-pin {
+    transform: translate(-50%, -50%);
+  }
+  .hero-tilt:hover .hero-tag-wrap--right .hero-tag-pin {
+    transform: translate(50%, -50%);
+  }
+  .hero-tilt:hover .hero-tag-wrap--bottom .hero-tag-pin {
+    transform: translate(-50%, 50%);
+  }
+  .hero-tilt:hover .hero-tag-wrap--left .hero-tag-pin {
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Education timeline — left rail inside the content container
+   Line follows the icon centre (icon w-11 → 22px, sm w-14 → 28px).
+   Cards use full remaining width (flex-1 min-w-0) with safe wrapping.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.education-rail-line {
+  position: absolute;
+  left: 1.375rem; /* 22px = icon w-11 centre */
+  top: 0;
+  bottom: 28px;
+  width: 2px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  transform-origin: top;
+}
+
+@media (min-width: 640px) {
+  .education-rail-line {
+    left: 1.75rem; /* 28px = icon sm:w-14 centre */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .education-rail-line {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Premium mobile navigation drawer (rebuilt)
+   Full-height, near-full-width, dark glass panel with staggered
+   profile → nav → resume/socials. Only active below `lg`.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100; /* above the fixed header (1000) */
+  background: rgba(2, 6, 23, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.mobile-nav-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1110; /* above the backdrop + fixed header */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  width: min(88vw, 380px);
+  max-width: 100%;
+  height: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--c-base-2) 72%, transparent);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  border-left: 1px solid var(--c-border-strong);
+  box-shadow:
+    0 0 60px -20px rgba(2, 6, 23, 0.6),
+    -24px 0 60px -30px color-mix(in srgb, var(--c-primary) 30%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.mobile-nav-drawer-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 100% -10%, color-mix(in srgb, var(--c-primary) 22%, transparent), transparent 45%),
+    radial-gradient(circle at 0% 45%, color-mix(in srgb, var(--c-secondary) 14%, transparent), transparent 45%),
+    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--c-accent) 10%, transparent), transparent 40%);
+}
+
+.mobile-nav-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  border-bottom: 1px solid var(--c-border);
+  flex: none;
+}
+
+.mobile-nav-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.25rem;
+}
+
+/* ── Profile area ── */
+.mobile-nav-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0 1.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.mobile-nav-avatar {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  padding: 3px;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  box-shadow: 0 0 28px -6px color-mix(in srgb, var(--c-primary) 60%, transparent);
+  overflow: hidden;
+}
+
+.mobile-nav-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+  background: var(--c-base-2);
+}
+
+.mobile-nav-name {
+  margin-top: 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--c-content);
+}
+
+.mobile-nav-role {
+  margin-top: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+/* ── Navigation list ── */
+.mobile-nav-list {
+  padding-bottom: 0.5rem;
+}
+
+.mobile-nav-section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+.mobile-nav-section-label::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: linear-gradient(to right, var(--c-border-strong), transparent);
+}
+
+.mobile-nav-ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mobile-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-height: 50px;
+  padding: 0.625rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--c-muted);
+  border: 1px solid transparent;
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-item:active {
+  transform: scale(0.985);
+}
+
+.mobile-nav-item:hover {
+  color: var(--c-content);
+  background: color-mix(in srgb, var(--c-surface-2) 60%, transparent);
+}
+
+.mobile-nav-item:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
+}
+
+.mobile-nav-icon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: none;
+  border-radius: 0.75rem;
+  color: var(--c-muted);
+  background: color-mix(in srgb, var(--c-surface-2) 70%, transparent);
+  border: 1px solid var(--c-border);
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.mobile-nav-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-nav-index {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--c-muted) 70%, transparent);
+  transition: color 0.25s ease;
+}
+
+.mobile-nav-index.is-active {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.mobile-nav-item:hover .mobile-nav-index {
+  color: var(--c-primary);
+}
+
+.mobile-nav-item.is-active .mobile-nav-index {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Active item */
+.mobile-nav-item.is-active {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  border-color: color-mix(in srgb, var(--c-primary) 45%, transparent);
+  box-shadow:
+    0 10px 28px -12px color-mix(in srgb, var(--c-primary) 70%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.dark .mobile-nav-item.is-active {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-primary) 42%, #1e1b4b),
+    color-mix(in srgb, var(--c-secondary) 42%, #3b0764)
+  );
+}
+
+.mobile-nav-item.is-active .mobile-nav-icon {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* ── Footer: resume + socials ── */
+.mobile-nav-footer {
+  padding-top: 1.25rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--c-border);
+}
+
+.mobile-nav-socials {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.mobile-nav-socials-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+.mobile-nav-safe-bottom {
+  flex: none;
+  height: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* Tablet (768–1023): slightly wider drawer, still slide-in */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .mobile-nav-drawer {
+    width: min(72vw, 400px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-nav-item,
+  .mobile-nav-icon {
+    transition: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Site footer — professional multi-column layout
+   Theme-aware surface + glow décor, animated links, brand tiles,
+   resume CTA and back-to-top. Fully responsive 1 → 2 → 4 columns.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.site-footer {
+  background:
+    radial-gradient(1000px 400px at 12% 0%, var(--glow-a), transparent 60%),
+    radial-gradient(900px 380px at 100% 10%, var(--glow-b), transparent 58%),
+    color-mix(in srgb, var(--c-base-2) 78%, transparent);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+
+.footer-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -40%;
+  width: 60rem;
+  height: 30rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--c-primary) 14%, transparent),
+    transparent 70%
+  );
+  filter: blur(40px);
+}
+
+.footer-grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--c-border-strong) 40%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--c-border-strong) 40%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 0%, black 5%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 80% at 50% 0%, black 5%, transparent 75%);
+}
+
+.dark .footer-grid-lines {
+  opacity: 0.14;
+}
+
+/* Column heading */
+.footer-heading {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-content);
+  position: relative;
+  padding-bottom: 0.6rem;
+}
+
+.footer-heading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1.75rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--c-primary), var(--c-secondary));
+}
+
+/* Center the heading underline on mobile (columns are centered there) */
+@media (max-width: 767.98px) {
+  .footer-heading::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .footer-cta {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Animated quick links */
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--c-muted);
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.footer-link-dot {
+  width: 0.32rem;
+  height: 0.32rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--c-muted);
+  opacity: 0.55;
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.footer-link:hover,
+.footer-link:focus-visible {
+  color: var(--c-primary);
+  transform: translateX(4px);
+}
+
+.footer-link:hover .footer-link-dot,
+.footer-link:focus-visible .footer-link-dot {
+  background: var(--c-primary);
+  opacity: 1;
+  transform: scale(1.4);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--c-primary) 70%, transparent);
+}
+
+/* Contact rows */
+.footer-contact {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  max-width: 100%;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--c-muted);
+  transition: color 0.25s ease;
+}
+
+.footer-contact-icon {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  flex: none;
+  border-radius: 0.7rem;
+  color: var(--c-primary);
+  background: color-mix(in srgb, var(--c-primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c-primary) 22%, transparent);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+a.footer-contact:hover,
+a.footer-contact:focus-visible {
+  color: var(--c-content);
+}
+
+a.footer-contact:hover .footer-contact-icon,
+a.footer-contact:focus-visible .footer-contact-icon {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  transform: scale(1.06);
+}
+
+/* Resume CTA */
+.footer-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.4rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--c-content);
+  background: color-mix(in srgb, var(--c-surface-2) 70%, transparent);
+  border: 1px solid var(--c-border-strong);
+  overflow: hidden;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.footer-cta-icon {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  flex: none;
+  border-radius: 0.6rem;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  transition: transform 0.3s ease;
+}
+
+.footer-cta-arrow {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.footer-cta:hover,
+.footer-cta:focus-visible {
+  color: #ffffff;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--c-primary) 75%, transparent);
+}
+
+.footer-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  transition: opacity 0.3s ease;
+}
+
+.dark .footer-cta::before {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-primary) 42%, #1e1b4b),
+    color-mix(in srgb, var(--c-secondary) 42%, #3b0764)
+  );
+}
+
+.footer-cta:hover::before,
+.footer-cta:focus-visible::before {
+  opacity: 1;
+}
+
+.footer-cta:hover .footer-cta-icon,
+.footer-cta:focus-visible .footer-cta-icon {
+  background: rgba(255, 255, 255, 0.18);
+  transform: rotate(-8deg);
+}
+
+.footer-cta:hover .footer-cta-arrow,
+.footer-cta:focus-visible .footer-cta-arrow {
+  transform: translateX(4px);
+}
+
+/* Back to top pill */
+.footer-totop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--c-muted);
+  background: color-mix(in srgb, var(--c-surface-2) 60%, transparent);
+  border: 1px solid var(--c-border);
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.footer-totop:hover,
+.footer-totop:focus-visible {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  border-color: transparent;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--c-primary) 75%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-link,
+  .footer-link-dot,
+  .footer-contact,
+  .footer-contact-icon,
+  .footer-cta,
+  .footer-cta-icon,
+  .footer-cta-arrow,
+  .footer-totop {
+    transition: none;
+  }
+
+  .footer-link:hover,
+  .footer-link:focus-visible,
+  .footer-cta:hover,
+  .footer-cta:focus-visible,
+  .footer-totop:hover,
+  .footer-totop:focus-visible {
+    transform: none;
+  }
 }

@@ -1,7 +1,8 @@
-import { motion } from 'framer-motion'
-import { FiCode, FiServer, FiDatabase, FiCloud, FiShield, FiCpu } from 'react-icons/fi'
+import { useEffect, useRef, useState } from 'react'
+import { FiCode, FiServer, FiDatabase, FiCloud, FiShield, FiCpu, FiVolume2, FiVolumeX } from 'react-icons/fi'
 import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
+import AboutTerminal from './AboutTerminal'
 
 const highlights = [
   { icon: FiServer, label: 'MERN Stack', desc: 'End-to-end development' },
@@ -13,8 +14,51 @@ const highlights = [
 ]
 
 export default function About() {
+  const videoRef = useRef(null)
+  const [muted, setMuted] = useState(true)
+
+  /* Guaranteed autoplay: muted is forced via property (React's `muted`
+     attribute alone is unreliable), playback is attempted on mount,
+     again once data can play, and again when the tab becomes visible —
+     so PAGE LOAD → VIDEO LOADS → VIDEO PLAYS with no click needed. */
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return undefined
+    video.muted = true
+    video.defaultMuted = true
+    video.volume = 1
+    const tryPlay = () => {
+      if (video.paused) {
+        const play = video.play()
+        if (play && typeof play.catch === 'function') play.catch(() => {})
+      }
+    }
+    tryPlay()
+    video.addEventListener('canplay', tryPlay)
+    document.addEventListener('visibilitychange', tryPlay)
+    return () => {
+      video.removeEventListener('canplay', tryPlay)
+      document.removeEventListener('visibilitychange', tryPlay)
+    }
+  }, [])
+
+  /* Toggle sound: unmuting requires a user gesture, so this runs on click. */
+  const toggleSound = () => {
+    const video = videoRef.current
+    if (!video) return
+    const next = !muted
+    video.muted = next
+    video.defaultMuted = next
+    if (!next) {
+      video.volume = 1
+      const play = video.play()
+      if (play && typeof play.catch === 'function') play.catch(() => {})
+    }
+    setMuted(next)
+  }
+
   return (
-    <section id="about" className="relative py-20 md:py-28">
+    <section id="about" className="relative py-20 md:py-28 overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Who I Am"
@@ -22,57 +66,65 @@ export default function About() {
           description="A Full Stack MERN Developer and MCA student building scalable, secure, AI-powered web applications."
         />
 
-        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-center">
-          {/* Portrait */}
-          <Reveal direction="left" className="flex justify-center">
-            <div className="relative group max-w-sm w-full">
-              <div
-                className="absolute inset-0 rounded-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500"
-                style={{ background: 'var(--glow-a)', filter: 'blur(60px)' }}
-                aria-hidden="true"
-              />
-              <div className="gradient-border-card rounded-3xl p-1.5 glass">
-                <img
-                  src="/2.jpeg"
-                  alt="Dev Patel portrait"
-                  className="w-full aspect-[4/5] object-cover rounded-3xl"
-                  width={400}
-                  height={500}
-                  loading="lazy"
-                  decoding="async"
+        <div className="about-layout">
+          {/* Left stack: profile video card with the terminal below it.
+              `display: contents` on mobile/tablet keeps the grid
+              reading order (media → content → terminal); a flex column on
+              desktop keeps image + terminal as one component. */}
+          <div className="about-left">
+            <Reveal direction="left" className="about-media">
+              <div className="relative group w-full max-w-md lg:max-w-none mx-auto lg:mx-0">
+                <div
+                  className="absolute inset-0 rounded-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: 'var(--glow-a)', filter: 'blur(60px)' }}
+                  aria-hidden="true"
                 />
+                <div className="gradient-border-card rounded-3xl p-1.5 glass">
+                  <div className="about-video-wrap rounded-3xl">
+                    <video
+                      ref={videoRef}
+                      className="about-video"
+                      src="/My_Intro.mp4"
+                      autoPlay
+                      muted={muted}
+                      loop
+                      playsInline
+                      preload="auto"
+                      disablePictureInPicture
+                      aria-label="Dev Patel introduction video"
+                    />
+                    <button
+                      type="button"
+                      onClick={toggleSound}
+                      aria-label={muted ? 'Unmute video' : 'Mute video'}
+                      aria-pressed={!muted}
+                      className="about-video-sound"
+                    >
+                      {muted ? (
+                        <FiVolumeX className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
+                      ) : (
+                        <FiVolume2 className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
+                      )}
+                      <span className="hidden sm:inline">{muted ? 'Sound off' : 'Sound on'}</span>
+                    </button>
+                  </div>
+                </div>
               </div>
+            </Reveal>
 
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4, type: 'spring', stiffness: 240, damping: 18 }}
-                className="absolute -bottom-5 -right-3 sm:-right-6 rounded-2xl bg-gradient-accent px-5 py-4 shadow-xl text-white"
-              >
-                <div className="text-2xl font-black leading-none">3+</div>
-                <div className="text-[11px] font-medium opacity-90 mt-1">Years Learning</div>
-              </motion.div>
+            {/* Terminal card — attached below the video on desktop;
+                flows after the text content on mobile/tablet. */}
+            <Reveal direction="up" delay={0.1} className="about-terminal">
+              <AboutTerminal />
+            </Reveal>
+          </div>
 
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.55, type: 'spring', stiffness: 240, damping: 18 }}
-                className="absolute -top-4 -left-3 sm:-left-6 glass-strong rounded-2xl px-4 py-3 shadow-md"
-              >
-                <div className="text-[11px] font-bold text-gradient uppercase tracking-wide">MCA</div>
-                <div className="text-[10px] text-muted">Candidate</div>
-              </motion.div>
-            </div>
-          </Reveal>
-
-          {/* Content */}
-          <Reveal direction="right">
+          {/* ── Right column: text content + skill cards (no terminal here) ── */}
+          <Reveal direction="right" className="about-content">
             <h3 className="text-2xl md:text-3xl font-bold mb-5 text-gradient-heading">
               Full Stack MERN Developer &amp; MCA Student
             </h3>
-            <div className="space-y-4 text-muted leading-relaxed">
+            <div className="space-y-4 text-muted leading-relaxed text-justify hyphens-auto [text-justify:inter-word]">
               <p>
                 I'm a <strong className="text-content font-semibold">Full Stack MERN Developer</strong> and
                 current <strong className="text-content font-semibold">MCA student at Sardar Patel University</strong>{' '}

@@ -1,5 +1,40 @@
 export const projects = [
   {
+    id: 'clinic-ocr',
+    title: 'ClinicOCR — AI Medical Document Intelligence',
+    category: 'fullstack',
+    featured: true,
+    status: 'Live Project',
+    images: ['/clinicocr.jpg'],
+    tags: ['AI-Powered', 'MERN Stack', 'OCR System'],
+    tech: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Python', 'FastAPI', 'OpenCV', 'Tesseract OCR', 'Gemini AI', 'Tailwind CSS', 'JWT', 'Cloudinary'],
+    summary:
+      'An AI-powered medical document intelligence platform that digitizes handwritten prescriptions with OpenCV + Tesseract OCR, structures them with Gemini AI, and manages patient records with doctor-in-the-loop verification.',
+    description:
+      'ClinicOCR is a full-stack healthcare document-intelligence platform for small clinics and private doctors. It converts prescription images into structured digital medical records through image quality analysis, OpenCV preprocessing, Tesseract OCR with confidence scoring, Gemini AI extraction of medicines, dosage and frequency, mandatory doctor verification, and structured storage in MongoDB. The platform adds patient 360° profiles, treatment timelines, medicine history, prescription comparison, a RAG-based AI assistant over patient records, role-based access for admin, doctor, receptionist and patient, and clinic-level data isolation with audit logging.',
+    features: [
+      'Smart prescription upload with image quality analysis (blur, lighting, rotation, resolution)',
+      'OpenCV preprocessing pipeline — deskew, denoise, threshold and sharpen before OCR',
+      'Tesseract OCR with confidence scoring plus Gemini AI structuring into medicines, dosage and duration',
+      'Mandatory doctor verification workflow to review, edit and approve every AI extraction',
+      'Patient 360° profile, treatment timeline, medicine history and prescription comparison',
+      'RAG-based AI assistant and semantic search across patient records',
+      'Role-based access (admin, doctor, receptionist, patient) with JWT, RBAC and audit logs',
+    ],
+    challenges: [
+      'Reading illegible handwritten prescriptions reliably without risking wrong medical data.',
+      'Structuring raw OCR text into accurate medicine, dosage and frequency fields.',
+      'Isolating clinic data across multiple roles while keeping search fast.',
+    ],
+    solutions: [
+      'Chained OpenCV preprocessing with quality gates and per-field confidence scores before AI extraction.',
+      'Used Gemini AI to structure raw OCR output, gated by a mandatory doctor review and approval step.',
+      'Centralized JWT + RBAC middleware with clinic-scoped queries, Mongoose indexes and audit logging.',
+    ],
+    github: 'https://github.com/DevPatel-2208/CLINIC_OCR-SYSTEM',
+    live: null,
+  },
+  {
     id: 'shophubx',
     title: 'ShopHubX — MERN E-Commerce Platform',
     category: 'fullstack',

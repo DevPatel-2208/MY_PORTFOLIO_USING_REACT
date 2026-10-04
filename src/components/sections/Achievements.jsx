@@ -15,6 +15,7 @@ import Reveal from '../ui/Reveal'
 import Badge from '../ui/Badge'
 import AnimatedNumber from '../ui/AnimatedNumber'
 import Modal from '../ui/Modal'
+import TiltCard from '../ui/TiltCard'
 
 const gradients = {
   blue: { from: '#3b82f6', to: '#6366f1', glow: 'rgba(59, 130, 246, 0.45)' },
@@ -87,81 +88,91 @@ const PARTICLE_COUNT = 12
 const noiseTexture =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")"
 
-function AchievementCard({ card, variants, reduceMotion }) {
+function AchievementCard({ card, variants }) {
   const { icon: Icon, gradient, badge, title, subtitle, description } = card
 
   return (
-    <motion.article
-      variants={variants}
-      whileHover={reduceMotion ? {} : { y: -8, scale: 1.015 }}
-      whileTap={reduceMotion ? {} : { scale: 0.985 }}
-      transition={{ type: 'spring', stiffness: 230, damping: 22 }}
-      className="group relative h-full"
-    >
-      {/* Subtle top-left radial tint — adds depth, never covers content */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-        style={{
-          background: 'radial-gradient(circle at top left, rgba(139, 92, 246, 0.10), transparent 60%)',
-        }}
-      />
+    <TiltCard className="h-full" max={12} scale={1.02}>
+      <motion.article variants={variants} className="group relative h-full [transform-style:preserve-3d]">
+        {/* Subtle top-left radial tint — adds depth, never covers content */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+          style={{
+            background: 'radial-gradient(circle at top left, rgba(139, 92, 246, 0.10), transparent 60%)',
+          }}
+        />
 
-      {/* Card body */}
-      <div className="relative h-full rounded-3xl border border-border bg-surface-2/95 dark:bg-[rgba(20,24,38,0.88)] backdrop-blur-xl p-7 flex flex-col overflow-hidden shadow-soft transition-all duration-500 group-hover:border-secondary/50 group-hover:bg-white dark:group-hover:bg-[rgba(26,30,47,0.93)] group-hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.25)] dark:group-hover:shadow-[0_20px_50px_rgba(139,92,246,0.18)]">
-        {/* Top row: badge + arrow */}
-        <div className="relative flex items-center justify-between gap-3 mb-5">
-          <span
-            className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border transition-transform duration-500 group-hover:-translate-y-0.5"
-            style={{
-              color: gradient.from,
-              background: `color-mix(in srgb, ${gradient.from} 10%, transparent)`,
-              borderColor: `color-mix(in srgb, ${gradient.from} 30%, transparent)`,
-            }}
-          >
-            {badge}
-          </span>
-          <span
-            aria-hidden="true"
-            className="relative grid place-items-center w-8 h-8 rounded-full text-white opacity-75 transition-all duration-500 group-hover:opacity-100 group-hover:brightness-110"
-            style={{ background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})` }}
-          >
-            <LuArrowUpRight className="w-4 h-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:rotate-45" />
-          </span>
-        </div>
+        {/* Glow border on hover */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
+          style={{
+            boxShadow: 'inset 0 0 0 1px var(--c-secondary), 0 0 36px -12px var(--c-secondary)',
+          }}
+        />
 
-        {/* Icon */}
-        <div className="relative w-14 h-14">
-          <span
-            aria-hidden="true"
-            className="absolute -inset-1.5 rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"
-            style={{ background: gradient.glow }}
-          />
-          <div
-            className="relative w-14 h-14 rounded-2xl grid place-items-center text-white transition-all duration-500 group-hover:scale-[1.08] group-hover:brightness-110"
-            style={{
-              background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})`,
-              boxShadow: `0 10px 30px -8px ${gradient.glow}`,
-            }}
-          >
-            <Icon className="w-6 h-6" aria-hidden="true" />
+        {/* Card body — overflow-hidden removed so the 3D layers can lift */}
+        <div className="relative h-full rounded-3xl border border-border bg-surface-2/95 dark:bg-[rgba(20,24,38,0.88)] backdrop-blur-xl p-7 flex flex-col shadow-soft transition-all duration-500 group-hover:border-secondary/50 group-hover:bg-white dark:group-hover:bg-[rgba(26,30,47,0.93)] group-hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.25)] dark:group-hover:shadow-[0_20px_50px_rgba(139,92,246,0.18)] [transform-style:preserve-3d]">
+          {/* Top row: badge + arrow */}
+          <div className="relative flex items-center justify-between gap-3 mb-5 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">
+            <span
+              className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border transition-transform duration-500 group-hover:-translate-y-0.5"
+              style={{
+                color: gradient.from,
+                background: `color-mix(in srgb, ${gradient.from} 10%, transparent)`,
+                borderColor: `color-mix(in srgb, ${gradient.from} 30%, transparent)`,
+              }}
+            >
+              {badge}
+            </span>
+            <span
+              aria-hidden="true"
+              className="relative grid place-items-center w-8 h-8 rounded-full text-white opacity-75 transition-all duration-500 group-hover:opacity-100 group-hover:brightness-110"
+              style={{ background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})` }}
+            >
+              <LuArrowUpRight className="w-4 h-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:rotate-45" />
+            </span>
           </div>
+
+          {/* Icon — pops furthest forward */}
+          <div className="relative w-14 h-14 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(46px)]">
+            <span
+              aria-hidden="true"
+              className="absolute -inset-1 rounded-2xl blur-lg opacity-0 group-hover:opacity-40 transition-opacity duration-500"
+              style={{ background: gradient.glow }}
+            />
+            <div
+              className="relative w-14 h-14 rounded-2xl grid place-items-center text-white transition-all duration-500 group-hover:scale-[1.08] group-hover:brightness-110"
+              style={{
+                background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})`,
+                boxShadow: `0 10px 30px -8px ${gradient.glow}`,
+              }}
+            >
+              <Icon className="w-6 h-6" aria-hidden="true" />
+            </div>
+          </div>
+
+          {/* Title */}
+          <h3 className="relative mt-5 text-lg xl:text-xl font-bold text-content leading-snug transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(26px)]">
+            {title}
+          </h3>
+
+          {/* Subtitle */}
+          <p
+            className="relative mt-1.5 text-sm font-semibold tracking-wide transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(22px)]"
+            style={{ color: gradient.from }}
+          >
+            {subtitle}
+          </p>
+
+          {/* Description */}
+          <p className="relative mt-3 text-sm text-muted leading-relaxed flex-1 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(16px)]">
+            {description}
+          </p>
         </div>
-
-        {/* Title */}
-        <h3 className="relative mt-5 text-lg xl:text-xl font-bold text-content leading-snug">
-          {title}
-        </h3>
-
-        {/* Subtitle */}
-        <p className="relative mt-1.5 text-sm font-semibold tracking-wide" style={{ color: gradient.from }}>
-          {subtitle}
-        </p>
-
-        {/* Description */}
-        <p className="relative mt-3 text-sm text-muted leading-relaxed flex-1">{description}</p>
-      </div>
-    </motion.article>
+      </motion.article>
+    </TiltCard>
   )
 }
 
@@ -308,12 +319,7 @@ export default function Achievements() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8"
         >
           {cards.map((card) => (
-            <AchievementCard
-              key={card.title}
-              card={card}
-              variants={cardVariants}
-              reduceMotion={reduceMotion}
-            />
+            <AchievementCard key={card.title} card={card} variants={cardVariants} />
           ))}
         </motion.div>
 
@@ -345,41 +351,47 @@ export default function Achievements() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {achievementImages.map((img, i) => (
             <Reveal key={img.src} delay={(i % 5) * 0.04} amount={0.2}>
-              <motion.button
-                type="button"
-                onClick={() => setSelected(img)}
-                whileHover={reduceMotion ? {} : { y: -4, scale: 1.02 }}
-                whileTap={reduceMotion ? {} : { scale: 0.98 }}
-                className="relative group w-full rounded-2xl overflow-hidden cursor-pointer border border-border focus-visible:outline-2 focus-visible:outline-primary"
-                style={{ aspectRatio: '4 / 5' }}
-                aria-label={`View ${img.caption} (${img.label})`}
-              >
-                <img
-                  src={img.src}
-                  alt={`${img.label} — ${img.caption}`}
-                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div
-                  className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-80 transition-opacity group-hover:opacity-95"
-                  aria-hidden="true"
-                />
-                <span
-                  className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white ${
-                    img.extra ? 'bg-accent/90' : 'bg-primary/90'
-                  }`}
+              <TiltCard className="w-full" max={16} scale={1.05} glareRadius="1rem">
+                <button
+                  type="button"
+                  onClick={() => setSelected(img)}
+                  className="group relative block w-full rounded-2xl cursor-pointer border border-border bg-surface-2 transition-[box-shadow,border-color] duration-500 hover:border-primary/40 hover:shadow-glow focus-visible:outline-2 focus-visible:outline-primary [transform-style:preserve-3d]"
+                  style={{ aspectRatio: '4 / 5' }}
+                  aria-label={`View ${img.caption} (${img.label})`}
                 >
-                  {img.label}
-                </span>
-                <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-white drop-shadow">{img.caption}</span>
-                  <FiZoomIn
-                    className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-hidden="true"
-                  />
-                </div>
-              </motion.button>
+                  {/* Clip layer — keeps the photo inside the rounded corners
+                      while it still travels forward on the Z axis */}
+                  <span className="absolute inset-0 rounded-2xl overflow-hidden transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(26px)]">
+                    <img
+                      src={img.src}
+                      alt={`${img.label} — ${img.caption}`}
+                      className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span
+                      className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-80 transition-opacity group-hover:opacity-95"
+                      aria-hidden="true"
+                    />
+                  </span>
+
+                  <span
+                    className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(48px)] ${
+                      img.extra ? 'bg-accent/90' : 'bg-primary/90'
+                    }`}
+                  >
+                    {img.label}
+                  </span>
+
+                  <span className="absolute bottom-2 left-2 right-2 flex items-center justify-between transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(40px)]">
+                    <span className="text-xs font-semibold text-white drop-shadow">{img.caption}</span>
+                    <FiZoomIn
+                      className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </button>
+              </TiltCard>
             </Reveal>
           ))}
         </div>
