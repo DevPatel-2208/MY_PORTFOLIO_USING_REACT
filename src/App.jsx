@@ -8,6 +8,8 @@ import ScrollToTop from './components/layout/ScrollToTop'
 import Cursor from './components/cursor/Cursor'
 import Preloader from './components/layout/Preloader'
 import SEO from './components/seo/SEO'
+import CommandPalette from './components/ui/CommandPalette'
+import usePaletteHotkey from './hooks/usePaletteHotkey'
 
 const Hero = lazy(() => import('./components/sections/Hero'))
 const About = lazy(() => import('./components/sections/About'))
@@ -38,7 +40,13 @@ function LazySection({ children }) {
 function App() {
   const [showResults, setShowResults] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
   const finishLoad = useCallback(() => setLoaded(true), [])
+  const togglePalette = useCallback(() => setPaletteOpen((v) => !v), [])
+  const closePalette = useCallback(() => setPaletteOpen(false), [])
+  const openPalette = useCallback(() => setPaletteOpen(true), [])
+
+  usePaletteHotkey(togglePalette)
 
   return (
     <>
@@ -54,7 +62,7 @@ function App() {
       <Cursor />
       <BackgroundFX />
       <ScrollProgress />
-      <Navbar />
+      <Navbar onOpenPalette={openPalette} />
 
       <main>
         <LazySection>
@@ -91,6 +99,7 @@ function App() {
 
       <Footer />
       <ScrollToTop />
+      <CommandPalette open={paletteOpen} onClose={closePalette} />
       <Suspense fallback={null}>
         <ResultModal show={showResults} onClose={() => setShowResults(false)} />
       </Suspense>

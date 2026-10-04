@@ -13,6 +13,7 @@ import {
   FiMail,
   FiX,
   FiMenu,
+  FiSearch,
 } from 'react-icons/fi'
 import { FaTrophy } from 'react-icons/fa'
 import { BsSun, BsMoon } from 'react-icons/bs'
@@ -40,7 +41,7 @@ const navIcons = {
   contact: FiMail,
 }
 
-export default function Navbar() {
+export default function Navbar({ onOpenPalette = () => {} }) {
   const { theme, toggleTheme } = useTheme()
   const active = useActiveSection(sectionIds)
   const [open, setOpen] = useState(false)
@@ -125,7 +126,7 @@ export default function Navbar() {
     : 'border-transparent'
 
   const linkClass = (isActive) =>
-    `group relative flex items-center rounded-full px-2 xl:px-3 py-2 text-xs xl:text-[13px] font-semibold tracking-wide whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+    `group relative flex items-center rounded-full px-1.5 xl:px-2.5 py-2 text-xs 2xl:text-[13px] font-semibold tracking-wide whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
       isActive ? 'text-white' : 'text-muted hover:text-content'
     }`
 
@@ -140,7 +141,7 @@ export default function Navbar() {
           WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(160%)' : 'blur(6px)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[1fr_auto] lg:grid-cols-[1fr_auto_1fr] items-center gap-3 h-16 lg:h-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[1fr_auto] xl:grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-3 h-16 lg:h-20">
           {/* Logo */}
           <a
             href="#home"
@@ -165,7 +166,7 @@ export default function Navbar() {
 
           {/* Desktop navigation (centered) */}
           <nav
-            className="hidden lg:flex justify-self-center items-center gap-0.5"
+            className="hidden xl:flex justify-self-center items-center gap-0.5"
             aria-label="Primary navigation"
           >
             {navLinks.map((link) => {
@@ -206,6 +207,21 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="justify-self-end flex items-center gap-2 sm:gap-3">
+            {/* Command palette trigger — compact icon circle at every
+                width. A full pill never fits next to 10 links + logo +
+                resume inside the capped container, so discoverability comes
+                from the hover tooltip, the palette footer hints, and the
+                drawer entry instead. */}
+            <button
+              type="button"
+              onClick={onOpenPalette}
+              aria-label="Search commands and sections (Control K)"
+              title="Search commands (Ctrl+K)"
+              className="h-10 w-10 inline-flex items-center justify-center rounded-full glass text-muted hover:text-content hover:bg-surface-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <FiSearch className="w-4 h-4 shrink-0" aria-hidden="true" />
+            </button>
+
             <button
               type="button"
               onClick={toggleTheme}
@@ -231,13 +247,13 @@ export default function Navbar() {
               external
               size="sm"
               data-cursor="click"
-              className="!hidden lg:!inline-flex min-h-10 !px-3.5 xl:!px-4"
+              className="!hidden xl:!inline-flex min-h-10 !px-3.5 2xl:!px-4"
             >
               <FiDownload className="w-4 h-4" aria-hidden="true" />
               Resume
             </Button>
 
-            {/* Hamburger (mobile only) */}
+            {/* Hamburger (below xl — the drawer serves tablet + small desktop) */}
             <button
               ref={triggerRef}
               type="button"
@@ -245,7 +261,7 @@ export default function Navbar() {
               aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={open}
               aria-controls={MOBILE_MENU_ID}
-              className="lg:hidden w-11 h-11 rounded-full glass grid place-items-center text-content hover:text-primary hover:bg-surface-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="xl:hidden w-11 h-11 rounded-full glass grid place-items-center text-content hover:text-primary hover:bg-surface-2 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
@@ -275,7 +291,7 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="mobile-nav-backdrop lg:hidden"
+              className="mobile-nav-backdrop xl:hidden"
               onClick={() => setOpen(false)}
               aria-hidden="true"
             />
@@ -293,7 +309,7 @@ export default function Navbar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: '100%' }}
               transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="mobile-nav-drawer lg:hidden"
+              className="mobile-nav-drawer xl:hidden"
             >
               {/* Drawer background décor */}
               <div className="mobile-nav-drawer-bg" aria-hidden="true" />
@@ -356,6 +372,22 @@ export default function Navbar() {
 
                 {/* Navigation list */}
                 <nav className="mobile-nav-list" aria-label="Mobile navigation">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false)
+                      onOpenPalette()
+                    }}
+                    className="mobile-nav-item w-full text-left cursor-pointer mb-2"
+                  >
+                    <span className="mobile-nav-icon">
+                      <FiSearch className="w-5 h-5" aria-hidden="true" />
+                    </span>
+                    <span className="mobile-nav-label">Search commands</span>
+                    <span className="mobile-nav-index" aria-hidden="true">
+                      ⌘K
+                    </span>
+                  </button>
                   <p className="mobile-nav-section-label">
                     <span>Navigation</span>
                   </p>

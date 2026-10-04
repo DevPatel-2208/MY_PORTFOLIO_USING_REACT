@@ -5,6 +5,7 @@ import { FaTrophy } from 'react-icons/fa'
 import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
 import Button from '../ui/Button'
+import TiltCard from '../ui/TiltCard'
 import { educationTimeline, bcaSemesters, mcaSemesters } from '../../data/education'
 
 const iconMap = {
@@ -24,8 +25,15 @@ const timelineLine =
 
 function EducationCard({ item }) {
   return (
-    <div className="gradient-border-card rounded-3xl glass p-5 sm:p-6 md:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow">
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
+    <article className="group gradient-border-card relative rounded-3xl glass p-5 sm:p-6 md:p-8 transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+      {/* Glow border on hover */}
+      <div
+        className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
+        style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 36px -12px var(--c-primary)' }}
+        aria-hidden="true"
+      />
+
+      <div className="relative flex flex-wrap items-center gap-2 sm:gap-3 mb-3 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(32px)]">
         <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-primary/12 text-primary border border-primary/25">
           {item.period}
         </span>
@@ -34,13 +42,17 @@ function EducationCard({ item }) {
         </span>
       </div>
 
-      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-content leading-snug break-words">
+      <h3 className="relative text-lg sm:text-xl md:text-2xl font-bold text-content leading-snug break-words transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">
         {item.title}
       </h3>
-      <p className="text-sm font-semibold text-primary mt-1 break-words">{item.place}</p>
-      <p className="text-sm text-muted mt-3 leading-relaxed">{item.summary}</p>
+      <p className="relative text-sm font-semibold text-primary mt-1 break-words transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(26px)]">
+        {item.place}
+      </p>
+      <p className="relative text-sm text-muted mt-3 leading-relaxed transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(20px)]">
+        {item.summary}
+      </p>
 
-      <ul className="mt-4 space-y-2.5">
+      <ul className="relative mt-4 space-y-2.5 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(16px)]">
         {item.highlights.map((h) => {
           const HI = highlightIcon[h.icon] || FiAward
           return (
@@ -55,7 +67,7 @@ function EducationCard({ item }) {
       </ul>
 
       {item.metric && (
-        <div className="mt-5 pt-5 border-t border-border">
+        <div className="relative mt-5 pt-5 border-t border-border transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted">{item.metric.label}</span>
             <span className="text-lg font-black text-gradient">{item.metric.value}</span>
@@ -71,40 +83,49 @@ function EducationCard({ item }) {
           </div>
         </div>
       )}
-    </div>
+    </article>
   )
 }
 
 function SemesterCard({ sem, gpa, width, rank, upcoming, index }) {
   return (
-    <Reveal delay={index * 0.05} amount={0.3}>
-      <div className="h-full rounded-2xl glass p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow">
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <h5 className="text-sm font-bold text-content">{sem}</h5>
-          <span
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold text-white shrink-0 ${
-              upcoming ? 'bg-slate-500/60' : 'bg-gradient-accent'
-            }`}
-          >
-            {gpa}
-          </span>
-        </div>
-        <div className="h-2 rounded-full bg-surface-2 overflow-hidden">
-          <motion.div
-            initial={{ width: 0 }}
-            whileInView={{ width: `${width}%` }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-            className={`h-full rounded-full ${upcoming ? 'bg-slate-500/60' : 'bg-gradient-accent'}`}
+    <Reveal delay={index * 0.05} amount={0.3} className="h-full">
+      <TiltCard className="h-full" max={14} scale={1.04}>
+        <div className="group relative h-full rounded-2xl glass p-5 transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+          <div
+            className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
+            style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 28px -10px var(--c-primary)' }}
+            aria-hidden="true"
           />
-        </div>
-        {rank && (
-          <div className="mt-2.5 flex items-center gap-1.5 text-xs font-semibold text-accent">
-            <FaTrophy className="w-3.5 h-3.5" aria-hidden="true" />
-            {rank}
+          <div className="relative flex items-center justify-between gap-2 mb-3 [transform-style:preserve-3d]">
+            <h5 className="text-sm font-bold text-content transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(30px)]">
+              {sem}
+            </h5>
+            <span
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold text-white shrink-0 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(44px)] ${
+                upcoming ? 'bg-slate-500/60' : 'bg-gradient-accent'
+              }`}
+            >
+              {gpa}
+            </span>
           </div>
-        )}
-      </div>
+          <div className="relative h-2 rounded-full bg-surface-2 overflow-hidden transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(18px)]">
+            <motion.div
+              initial={{ width: 0 }}
+              whileInView={{ width: `${width}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              className={`h-full rounded-full ${upcoming ? 'bg-slate-500/60' : 'bg-gradient-accent'}`}
+            />
+          </div>
+          {rank && (
+            <div className="relative mt-2.5 flex items-center gap-1.5 text-xs font-semibold text-accent transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(26px)]">
+              <FaTrophy className="w-3.5 h-3.5" aria-hidden="true" />
+              {rank}
+            </div>
+          )}
+        </div>
+      </TiltCard>
     </Reveal>
   )
 }
@@ -197,7 +218,9 @@ export default function Education({ onShowResults }) {
                 transition={{ duration: 0.7, delay: 0.15 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
                 className="flex-1 min-w-0"
               >
-                <EducationCard item={item} />
+                <TiltCard max={10} scale={1.015}>
+                  <EducationCard item={item} />
+                </TiltCard>
               </motion.div>
             </div>
           ))}

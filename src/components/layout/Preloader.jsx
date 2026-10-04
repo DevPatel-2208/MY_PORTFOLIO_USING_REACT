@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { FiCheck } from 'react-icons/fi'
 import { site } from '../../data/site'
 import useScrollLock from '../../hooks/useScrollLock'
 
@@ -7,11 +8,13 @@ const EASE = [0.22, 1, 0.36, 1]
 const TOTAL_MS = 2600
 
 const BOOT_STEPS = [
-  { at: 0, msg: 'Initializing portfolio…' },
-  { at: 25, msg: 'Loading components…' },
-  { at: 50, msg: 'Preparing interface…' },
-  { at: 75, msg: 'Almost ready…' },
+  { at: 0, msg: 'Initializing portfolio…', short: 'Boot' },
+  { at: 25, msg: 'Loading components…', short: 'UI' },
+  { at: 50, msg: 'Preparing interface…', short: 'Polish' },
+  { at: 75, msg: 'Almost ready…', short: 'Ready' },
 ]
+
+const STACK = ['React 19', 'Vite', 'Tailwind v4', 'Framer Motion']
 
 function useBootProgress() {
   const [progress, setProgress] = useState(0)
@@ -50,7 +53,7 @@ export default function Preloader({ onDone }) {
     if (!done) return undefined
     const hold = reduce ? 150 : 700
     const t1 = window.setTimeout(() => setVisible(false), hold)
-    const t2 = window.setTimeout(() => onDone?.(), hold + (reduce ? 100 : 550))
+    const t2 = window.setTimeout(() => onDone?.(), hold + (reduce ? 100 : 750))
     return () => {
       window.clearTimeout(t1)
       window.clearTimeout(t2)
@@ -62,6 +65,8 @@ export default function Preloader({ onDone }) {
     [progress],
   )
 
+  const letters = useMemo(() => site.name.split(''), [])
+
   return (
     <AnimatePresence>
       {visible && (
@@ -69,7 +74,11 @@ export default function Preloader({ onDone }) {
           className="pl-root"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.5, ease: 'easeInOut' } }}
+          exit={
+            reduce
+              ? { opacity: 0, transition: { duration: 0.3 } }
+              : { y: '-100%', transition: { duration: 0.75, ease: [0.76, 0, 0.24, 1] } }
+          }
           role="status"
           aria-label="Loading portfolio"
         >
@@ -82,16 +91,22 @@ export default function Preloader({ onDone }) {
 
           <motion.div
             className="pl-card"
-            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.94 }}
-            animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 16 }}
+            animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
             exit={
               reduce
                 ? { opacity: 0 }
-                : { opacity: 0, scale: 0.96, transition: { duration: 0.45, ease: EASE } }
+                : { opacity: 0, scale: 0.96, transition: { duration: 0.35, ease: EASE } }
             }
             transition={{ duration: 0.6, ease: EASE }}
           >
+            {/* Avatar with revolving orbit dot */}
             <div className="pl-avatar-ring" aria-hidden="true">
+              {!reduce && (
+                <span className="pl-orbit">
+                  <span className="pl-orbit-dot" />
+                </span>
+              )}
               {imgOk ? (
                 <img
                   className="pl-avatar"
@@ -108,8 +123,41 @@ export default function Preloader({ onDone }) {
               )}
             </div>
 
-            <h1 className="pl-name">{site.name}</h1>
+            {/* Name — letter-by-letter rise */}
+            <h1 className="pl-name" aria-label={site.name}>
+              {letters.map((ch, i) =>
+                reduce ? (
+                  <span key={i} className="pl-letter" aria-hidden="true">
+                    {ch === ' ' ? ' ' : ch}
+                  </span>
+                ) : (
+                  <motion.span
+                    key={i}
+                    className="pl-letter"
+                    aria-hidden="true"
+                    initial={{ opacity: 0, y: 14, rotateX: -60 }}
+                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                    transition={{ delay: 0.15 + i * 0.035, duration: 0.5, ease: EASE }}
+                  >
+                    {ch === ' ' ? ' ' : ch}
+                  </motion.span>
+                ),
+              )}
+            </h1>
             <p className="pl-role">{site.role}</p>
+
+            {/* Boot step checklist */}
+            <div className="pl-steps" aria-hidden="true">
+              {BOOT_STEPS.map((s) => {
+                const lit = progress >= s.at
+                return (
+                  <span key={s.short} className={`pl-step${lit ? ' is-done' : ''}`}>
+                    <FiCheck className="pl-step-tick" aria-hidden="true" />
+                    {s.short}
+                  </span>
+                )
+              })}
+            </div>
 
             <div className="pl-status" aria-live="polite">
               <AnimatePresence mode="wait" initial={false}>
@@ -137,13 +185,27 @@ export default function Preloader({ onDone }) {
                 aria-label="Loading progress"
               >
                 <div className="pl-fill" style={{ width: `${progress}%` }}>
-                  <span className="pl-shine" aria-hidden="true" />
+                  {!reduce && <span className="pl-shine" aria-hidden="true" />}
                 </div>
+                <span
+                  className="pl-tip"
+                  style={{ left: `${progress}%` }}
+                  aria-hidden="true"
+                />
               </div>
               <div className="pl-meta">
                 <span className="pl-label">Loading</span>
                 <span className="pl-pct">{progress}%</span>
               </div>
+            </div>
+
+            {/* Stack strip */}
+            <div className="pl-stack" aria-hidden="true">
+              {STACK.map((s) => (
+                <span key={s} className="pl-stack-item">
+                  {s}
+                </span>
+              ))}
             </div>
           </motion.div>
         </motion.div>

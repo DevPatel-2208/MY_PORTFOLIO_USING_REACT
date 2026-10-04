@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { FiCode, FiServer, FiDatabase, FiCloud, FiShield, FiCpu, FiVolume2, FiVolumeX } from 'react-icons/fi'
 import Reveal from '../ui/Reveal'
 import SectionHeading from '../ui/SectionHeading'
+import TiltCard from '../ui/TiltCard'
 import AboutTerminal from './AboutTerminal'
+import CodingProfiles from './CodingProfiles'
 
 const highlights = [
   { icon: FiServer, label: 'MERN Stack', desc: 'End-to-end development' },
@@ -43,8 +45,7 @@ export default function About() {
   }, [])
 
   /* Toggle sound: unmuting requires a user gesture, so this runs on click. */
-  const toggleSound = () => {
-    const video = videoRef.current
+  const toggleSound = () => {    const video = videoRef.current
     if (!video) return
     const next = !muted
     video.muted = next
@@ -56,6 +57,31 @@ export default function About() {
     }
     setMuted(next)
   }
+
+  /* Command palette: "Play intro video" scrolls here and unmutes.
+     Triggered from a keyboard/click gesture so unmuted play is allowed. */
+  useEffect(() => {
+    const onPlayIntro = () => {
+      videoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      window.setTimeout(() => {
+        const video = videoRef.current
+        if (!video) return
+        if (video.muted) {
+          video.muted = false
+          video.defaultMuted = false
+          video.volume = 1
+          const play = video.play()
+          if (play && typeof play.catch === 'function') play.catch(() => {})
+          setMuted(false)
+        } else if (video.paused) {
+          const play = video.play()
+          if (play && typeof play.catch === 'function') play.catch(() => {})
+        }
+      }, 650)
+    }
+    window.addEventListener('portfolio:play-intro', onPlayIntro)
+    return () => window.removeEventListener('portfolio:play-intro', onPlayIntro)
+  }, [])
 
   return (
     <section id="about" className="relative py-20 md:py-28 overflow-x-clip">
@@ -73,32 +99,35 @@ export default function About() {
               desktop keeps image + terminal as one component. */}
           <div className="about-left">
             <Reveal direction="left" className="about-media">
-              <div className="relative group w-full max-w-md lg:max-w-none mx-auto lg:mx-0">
-                <div
-                  className="absolute inset-0 rounded-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: 'var(--glow-a)', filter: 'blur(60px)' }}
-                  aria-hidden="true"
-                />
-                <div className="gradient-border-card rounded-3xl p-1.5 glass">
-                  <div className="about-video-wrap rounded-3xl">
-                    <video
-                      ref={videoRef}
-                      className="about-video"
-                      src="/My_Intro.mp4"
-                      autoPlay
-                      muted={muted}
-                      loop
-                      playsInline
-                      preload="auto"
-                      disablePictureInPicture
-                      aria-label="Dev Patel introduction video"
-                    />
+              <TiltCard max={12} scale={1.02} glareRadius="1.5rem">
+                <div className="group relative w-full max-w-md lg:max-w-none mx-auto lg:mx-0 [transform-style:preserve-3d]">
+                  <div
+                    className="absolute inset-0 rounded-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{ background: 'var(--glow-a)', filter: 'blur(60px)' }}
+                    aria-hidden="true"
+                  />
+                  {/* Frame lifts as one surface; the sound pill floats above it */}
+                  <div className="gradient-border-card relative rounded-3xl p-1.5 glass transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(28px)]">
+                    <div className="about-video-wrap rounded-3xl">
+                      <video
+                        ref={videoRef}
+                        className="about-video"
+                        src="/My_Intro.mp4"
+                        autoPlay
+                        muted={muted}
+                        loop
+                        playsInline
+                        preload="auto"
+                        disablePictureInPicture
+                        aria-label="Dev Patel introduction video"
+                      />
+                    </div>
                     <button
                       type="button"
                       onClick={toggleSound}
                       aria-label={muted ? 'Unmute video' : 'Mute video'}
                       aria-pressed={!muted}
-                      className="about-video-sound"
+                      className="about-video-sound about-video-sound--float"
                     >
                       {muted ? (
                         <FiVolumeX className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
@@ -109,7 +138,7 @@ export default function About() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </TiltCard>
             </Reveal>
 
             {/* Terminal card — attached below the video on desktop;
@@ -157,19 +186,33 @@ export default function About() {
             {/* Highlights */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-8">
               {highlights.map((item, i) => (
-                <Reveal key={item.label} delay={i * 0.05} amount={0.3}>
-                  <div className="group h-full rounded-2xl glass p-4 text-center transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-glow">
-                    <div className="mx-auto mb-2.5 w-10 h-10 rounded-xl bg-primary/12 grid place-items-center text-primary transition-transform duration-300 group-hover:scale-110">
-                      <item.icon className="w-5 h-5" aria-hidden="true" />
+                <Reveal key={item.label} delay={i * 0.05} amount={0.3} className="h-full">
+                  <TiltCard className="h-full" max={16} scale={1.06} glareRadius="1rem">
+                    <div className="group relative h-full rounded-2xl glass p-4 text-center transition-[box-shadow,border-color,background-color] duration-500 hover:border-primary/40 hover:shadow-glow hover:bg-surface-2/70 [transform-style:preserve-3d]">
+                      <div
+                        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"
+                        style={{ boxShadow: 'inset 0 0 0 1px var(--c-primary), 0 0 28px -10px var(--c-primary)' }}
+                        aria-hidden="true"
+                      />
+                      <div className="relative mx-auto mb-2.5 w-10 h-10 rounded-xl bg-primary/12 grid place-items-center text-primary transition-transform duration-500 ease-out group-hover:scale-110 [transform:translateZ(0)] group-hover:[transform:translateZ(40px)]">
+                        <item.icon className="w-5 h-5" aria-hidden="true" />
+                      </div>
+                      <div className="relative text-sm font-bold text-content transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(28px)]">
+                        {item.label}
+                      </div>
+                      <div className="relative text-[11px] text-muted mt-0.5 transition-transform duration-500 ease-out [transform:translateZ(0)] group-hover:[transform:translateZ(20px)]">
+                        {item.desc}
+                      </div>
                     </div>
-                    <div className="text-sm font-bold text-content">{item.label}</div>
-                    <div className="text-[11px] text-muted mt-0.5">{item.desc}</div>
-                  </div>
+                  </TiltCard>
                 </Reveal>
               ))}
             </div>
           </Reveal>
         </div>
+
+        {/* Coding profiles strip — GitHub live, rest link out */}
+        <CodingProfiles />
       </div>
     </section>
   )

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { FiArrowRight, FiDownload, FiMapPin, FiMousePointer } from 'react-icons/fi'
 import { SiReact, SiNodedotjs, SiMongodb, SiExpress } from 'react-icons/si'
 import { typedRoles, heroStats, site } from '../../data/site'
@@ -87,6 +87,7 @@ const floatingTech = [
 
 export default function Hero() {
   const typed = useTypewriter(typedRoles)
+  const reduce = useReducedMotion()
 
   const container = {
     hidden: {},
@@ -138,6 +139,17 @@ export default function Hero() {
             className="order-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:self-center relative flex items-center justify-center mt-6 lg:mt-0"
           >
             <TiltCard className="hero-tilt" max={11} scale={1.035} glareRadius="9999px">
+              {/* Idle 3D breathing — gentle continuous sway so the portrait
+                  feels alive even without hover; hover tilt composes on top */}
+              <motion.div
+                animate={
+                  reduce
+                    ? undefined
+                    : { rotateX: [0, 3.5, 0, -3.5, 0], rotateY: [0, -4.5, 0, 4.5, 0] }
+                }
+                transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ transformStyle: 'preserve-3d' }}
+              >
               <div className="hero-orbit">
                 {/* Rotating dashed ring (outer orbit) */}
                 <div
@@ -158,6 +170,8 @@ export default function Hero() {
                     height={384}
                     fetchPriority="high"
                   />
+                  {/* Periodic light sweep across the face */}
+                  {!reduce && <span className="hero-photo-shine" aria-hidden="true" />}
                 </div>
 
                 {/* Floating tech tags — hang on the orbit ring, never over the photo */}
@@ -178,6 +192,7 @@ export default function Hero() {
                   </motion.div>
                 ))}
               </div>
+              </motion.div>
             </TiltCard>
           </motion.div>
 
