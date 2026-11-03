@@ -70,6 +70,41 @@ export const projects = [
     live: 'https://shophubx.netlify.app/',
   },
   {
+    id: 'campusnexus',
+    title: 'CampusNexus — Smart Campus Placement Platform',
+    category: 'fullstack',
+    featured: true,
+    status: 'Live Project',
+    images: ['/CampusNexus.png'],
+    tags: ['Campus Placement', 'MERN Stack', 'Role-Based Access'],
+    tech: ['React.js', 'Vite', 'Node.js', 'Express.js', 'MongoDB', 'Mongoose', 'JWT', 'Axios', 'Tailwind CSS'],
+    summary:
+      'A full-stack MERN-based smart campus placement platform that streamlines campus recruitment, connecting students, colleges, TPOs, and recruiters through a centralized system.',
+    description:
+      'CampusNexus is a full-stack MERN smart campus placement platform designed to streamline campus recruitment. It brings students, colleges, TPOs, and recruiters together through a centralized system with role-based authentication and dashboards, job and internship discovery with search and filtering, online job applications with status tracking, company and recruitment drive management, centralized placement management of activities and student records, a responsive UI across desktop, tablet, and mobile, and secure RESTful APIs backed by JWT-based authentication.',
+    features: [
+      'Role-based authentication and dashboards for Students, TPOs, Recruiters, and Admins',
+      'Job and internship discovery with search and filtering',
+      'Online job application and application status tracking',
+      'Company and recruitment drive management',
+      'Centralized placement management for activities and student records',
+      'Responsive UI across desktop, tablet, and mobile devices',
+      'Secure RESTful APIs with JWT-based authentication',
+    ],
+    challenges: [
+      'Coordinating role-based access and dashboards for four distinct user types.',
+      'Keeping job search and filtering fast as listings grow.',
+      'Tracking application status reliably across students and recruiters.',
+    ],
+    solutions: [
+      'Centralized JWT authentication with RBAC middleware and role-scoped dashboards.',
+      'Indexed MongoDB queries with Mongoose plus debounced client-side filtering.',
+      'Application status timeline stored per application for reliable tracking.',
+    ],
+    github: 'https://github.com/DevPatel-2208/CampusNexus-SMART-CAMPUS-PLACEMENT-PLATFORM',
+    live: 'https://campusnexus-placement-platform.netlify.app',
+  },
+  {
     id: 'gloomy',
     title: 'Gloomy — E-Commerce Platform',
     category: 'fullstack',
